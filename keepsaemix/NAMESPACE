@@ -1,0 +1,79 @@
+exportPattern("^[[:alpha:]]+")
+
+exportClasses(
+   "SaemixData",
+   "SaemixModel",
+   "SaemixObject"
+)
+
+# not exported "SaemixRepData","SaemixSimData","SaemixRes",
+
+exportMethods(
+   "[",
+   "[<-",
+   "read.saemixData",
+   "initialize",
+   "plot",
+   "show",
+   "showall",
+   "print",
+   "summary",
+   "predict",
+   "logLik",
+   "coef",
+   "psi",
+   "phi",
+   "eta"
+)
+
+export(
+   "saemixControl",
+   "saemixData",
+   "saemixModel",
+   "saemix",
+   "llis.saemix",
+   "llgq.saemix",
+   "map.saemix",
+   "conddist.saemix",
+   "compute.eta.map",
+   "compute.sres",
+   "fim.saemix",
+   "simul.saemix",
+   "saemix.plot.setoptions",
+   "saemix.plot.select",
+   "default.saemix.plots",
+   "basic.gof",
+   "advanced.gof",
+   "individual.fits",
+   "covariate.fits",
+   "testnpde",
+   "saemix.plot.data",
+   "saemix.plot.convergence",
+   "saemix.plot.llis",
+   "saemix.plot.obsvspred",
+   "saemix.plot.distribresiduals",
+   "saemix.plot.scatterresiduals",
+   "saemix.plot.fits",
+   "saemix.plot.npde",
+   "saemix.plot.vpc",
+   "saemix.plot.correlations",
+   "saemix.plot.randeff",
+   "saemix.plot.distpsi",
+   "saemix.plot.parcov",
+   "saemix.plot.randeffcov"
+)
+
+S3method(subset, SaemixData)
+
+import(methods)
+import(graphics)
+# honteusement pompe de lme4
+importFrom("stats",
+   predict,
+   coef,
+   logLik
+)
+
+# not exported
+# cutoff,cutoff.max,cutoff.eps,cutoff.res,norminv,normcdf,error,transpsi,transphi, derivphi,dtransphi,compute.Uy,conditional.distribution,trnd.mlx,gammarnd.mlx, tpdf.mlx,kurtosis,skewness,ggq.mlx, replace.plot.options,plotnpde,compute.vpc.pi, compute.eta.map, replace.data.options, saemix.data.setoptions
+

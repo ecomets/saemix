@@ -1,0 +1,275 @@
+
+# Convergence plots during fit (special function, not user-level)
+  convplot.infit<-function(allpar,K1,niter=0) {
+# Convergence plots for all the fixed effects, random effects and residual variability
+    np<-dim(allpar)[2]
+    K<-dim(allpar)[1]
+    n1<-round(sqrt(np))
+    n2<-ceiling(np/n1)
+    if(n1>5 | n2>5) {n1<-3;n2<-4}
+    if(niter==0) niter<-K
+    par(mfrow=c(n1,n2))
+    for(j in 1:np) {
+      plot(1:niter,allpar[1:niter,j],type="l", xlab="Iteration", ylab=colnames(allpar)[j])
+      abline(v=K1)
+    }
+  }
+  if(class(inp.model)!="SaemixModel") {
+    cat("Please provide a valid model object (see the help page for SaemixModel)\n")
+    return()
+  }
+  if(class(inp.data)!="SaemixData") {
+    cat("Please provide a valid data object (see the help page for SaemixData)\n")
+    return()
+  }
+
+  saemixObject<-new(Class="SaemixObject",data=inp.data,model=inp.model, options=inp.options)
+  opt.warn<-getOption("warn")
+  if(!saemixObject["options"]$warnings) options(warn=-1)
+
+  saemix.options<-saemixObject["options"]
+  saemix.model<-saemixObject["model"]
+  saemix.data<-saemixObject["data"]
+#  showall(saemixObject)
+
+# structural model, check nb of parameters
+  structural.model<-saemix.model["model"]
+  nb.parameters<-saemix.model["nb.parameters"]
+  N<-saemix.data["N"]
+
+# Stepsize
+  stepsize<-rep(1,saemix.options$nbiter.tot)
+stepsize[(saemix.options$nbiter.saemix[1]+1):saemix.options$nbiter.tot]<-1/
+(1:saemix.options$nbiter.saemix[2])
+  stepsize[1:saemix.options$nbiter.burn]<-0
+  alpha1.sa<-saemix.options$alpha.sa
+  alpha0.sa<-10^(-3/saemix.options$nbiter.sa)
+
+# Random generator
+  OLDRAND<-TRUE
+  set.seed(saemix.options$seed)
+
+# ECO TODO: integrate all this section in the object creation ?
+# Initialisation: 
+# create local copies modified of omega.init and covariate.model in saemix.model
+# A la fin: i1.omega2 renomme en indx.omega et ind.res en indx.res
+  i0.omega2<-which((1-diag(saemix.model["covariance.model"]))>0)
+  indest.omega<-which(saemix.model["covariance.model"]>0)
+#  i1.omega2<-which(diag(saemix.model$covariance.model)>0)
+  i1.omega2<-saemix.model@indx.omega
+  ind.res<-saemix.model["indx.res"]
+
+# Covariate model & design matrix
+  id<-saemix.data["data"][,saemix.data["name.group"]]
+  if(length(saemix.data["name.covariates"])==0) tab<-data.frame(id=id) else
+    tab<-data.frame(id=id,saemix.data["data"][, saemix.data["name.covariates",drop=FALSE]])
+   temp<-unique(tab)
+#temp<-temp[order(temp[,1]),]
+  if(length(saemix.data["name.covariates"])>0) {
+    Mcovariates<-matrix(c(rep(1,N),as.matrix(temp[,2:dim(temp)[2]])),nrow=N)} else {
+    Mcovariates<-matrix(rep(1,N),nrow=N)
+   }
+# removing from model unused lines
+  j.cov<-which(rowSums(saemix.model["betaest.model"])>0)
+  betaest.model<-saemix.model["betaest.model"][j.cov,,drop=FALSE]
+  Mcovariates<-Mcovariates[,j.cov,drop=FALSE] # eliminate all the unused covariates
+  for(icol in dim(Mcovariates)[2])
+    if(is.factor(Mcovariates[,icol])) Mcovariates[,icol]<-as.numeric(Mcovariates[,icol])-1
+  
+#  if(length(j.cov)==1) {
+#    betaest.model<-matrix(betaest.model,nrow=1, dimnames=list(c("Fixed"),colnames(saemix.model["betaest.model"])))
+#    Mcovariates<-matrix(Mcovariates)
+#  }
+  saemix.model["betaest.model"]<-betaest.model
+  temp1<-betaest.model[-c(1),,drop=FALSE]
+#  if(is.null(dim(temp1))) temp1<-matrix(temp1,nrow=1, dimnames=list(rownames(betaest.model)[-c(1)], colnames(betaest.model)))  
+  saemix.model["covariate.model"]<-temp1
+
+  fixedpsi.ini<-saemix.model["psi0"][1,] # initial fixed effects (original parametrization)
+  betaI.ini<-transpsi(matrix(fixedpsi.ini,nrow=1),saemix.model["transform.par"]) #initial fixed effects (Gaussian parametrization)
+  fixed.ini<-saemix.model["betaest.model"]*0
+  fixed.ini[1,]<-betaI.ini
+  nr.psi0<-dim(saemix.model["psi0"])[1]
+  nr.cov<-dim(saemix.model["betaest.model"])[1]
+  if(nr.psi0>nr.cov) {
+    saemix.model["psi0"]<-saemix.model["psi0"][1:nr.cov,,drop=FALSE]
+    nr.psi0<-dim(saemix.model["psi0"])[1]
+  }
+#t1<-NULL
+  if(nr.psi0<nr.cov) {
+#  t1<-t(covariate.model[(nr.psi0+1):nr.cov,])
+    psi1<-saemix.model["psi0"][nr.psi0,]
+    for(j in (nr.psi0+1):nr.cov)
+      saemix.model["psi0"]<-rbind(saemix.model["psi0"],psi1)
+    nr.psi0<-dim(saemix.model["psi0"])[1]
+  }
+  if(nr.psi0>1) fixed.ini[2:nr.psi0,]<-saemix.model["psi0"][2:nr.psi0,]
+
+#covariate.estim<-matrix(c(rep(saemix.model$fixed.estim,nr.psi0),t1),byrow=TRUE, nrow=nr.cov)
+  covariate.estim<-matrix(rep(saemix.model["fixed.estim"],nr.psi0),byrow=TRUE, ncol=length(saemix.model["fixed.estim"]))
+#if(!is.null(dim(t1))) covariate.estim<-rbind(covariate.estim,t1) 
+  covariate.estim<-covariate.estim*saemix.model["betaest.model"]
+
+  betas.ini<-fixed.ini[which(saemix.model["betaest.model"]>0)]
+  betas.ini<-matrix(betas.ini,ncol=1)
+
+  nb.betas<-sum(saemix.model["betaest.model"])
+  ind.covariate<-which(saemix.model["betaest.model"]==1)
+#matrix(which(covariate.model==1),nrow=1)
+
+# Initialising
+  yobs<-saemix.data["data"][,saemix.data["name.response"]]
+
+
+# # Residual Error model.
+# error models are a + bf described by [a b]
+# error models :
+#   constant            y = f + a*e
+#   proportional        y = f + b*f*e
+#   combined            y = f + (a+b*f)*e
+#   exponential         y = f*exp(a*e)    ( <=>  log(y) = log(f) + a*e )
+  ares.ini<-saemix.model["error.init"][1] # initial residual error model : constant coefficient
+  bres.ini<-saemix.model["error.init"][2] #  initial residual error model : proportional coefficient
+  ares<-ares.ini
+  bres<-bres.ini
+  pres<-c(ares,bres)
+
+  nb.theta<-nb.parameters+length(i1.omega2)+length(ind.res)
+  parpop<-matrix(data=0,nrow=(saemix.options$nbiter.tot+1),ncol=nb.theta)
+  colnames(parpop)<-c(saemix.model["name.modpar"],saemix.model["name.random"], saemix.model["name.res"][ind.res])
+  allpar<-matrix(data=0,nrow=(saemix.options$nbiter.tot+1), ncol=(nb.betas+length(i1.omega2)+length(ind.res)))
+  colnames(allpar)<-c(saemix.model["name.fixed"],saemix.model["name.random"], saemix.model["name.res"][ind.res])
+  var.eta<-diag(saemix.model["omega.init"])
+  theta0<-c(fixedpsi.ini,var.eta[i1.omega2],pres[ind.res])
+  parpop[1,]<-theta0
+
+# the covariates
+LCOV<-MCOV<-matrix(data=0,nrow=nb.betas,ncol=nb.parameters)
+j1<-1
+COV<-matrix(nrow=dim(Mcovariates)[1],ncol=0)
+pfix<-matrix(data=0,nrow=1,ncol=nb.parameters)
+mean.phi<-matrix(data=0,nrow=N,ncol=nb.parameters)
+for(j in 1:nb.parameters) {
+  jcov<-which(saemix.model["betaest.model"][,j]==1)
+  lambdaj<-fixed.ini[jcov,j]
+  aj<-Mcovariates[,jcov]
+  COV<-cbind(COV,aj)
+  nlj<-length(lambdaj)
+  j2<-j1+nlj-1
+  LCOV[j1:j2,j]<-matrix(data=1,nrow=nlj,ncol=1)
+  j1<-j2+1
+  if(length(jcov)<=1) mean.phi[,j]<-aj*lambdaj else mean.phi[,j]<-aj%*%lambdaj
+  pfix[j]<-length(lambdaj)
+}
+indx.betaI<-cumsum(c(0,pfix[1:(nb.parameters-1)]))+1
+idx<-1:nb.betas
+indx.betaC<-idx[is.na(match(idx,indx.betaI))]
+saemix.model["indx.fix"]<-indx.betaI
+saemix.model["indx.cov"]<-indx.betaC
+
+l1<-betas.ini
+l1[indx.betaI]<-transphi(matrix(l1[indx.betaI],nrow=1),saemix.model["transform.par"])
+allpar[1,]<-c(l1,var.eta[i1.omega2],pres[ind.res])
+
+COV2<-t(COV)%*%COV
+j.covariate<-which(LCOV==1)
+MCOV[j.covariate]<-betas.ini
+betas<-betas.ini
+
+ind.fix1<-which(covariate.estim[ind.covariate]==1)
+ind.fix0<-which(covariate.estim[ind.covariate]==0)
+COV1<-COV[,ind.fix1]
+#if(length(ind.fix0)==1) dstatphi<-matrix(COV[,ind.fix0],ncol=1)%*%MCOV[ind.fix0,] else 
+dstatphi<-COV[,ind.fix0,drop=FALSE]%*%MCOV[ind.fix0,]
+
+covariate.estim1<-covariate.estim
+covariate.estim1[,i0.omega2]<-0
+ind.fix11<-which(covariate.estim1[ind.covariate]==1)
+covariate.estim0<-covariate.estim
+covariate.estim0[,i1.omega2]<-0
+ind.fix10<-which(covariate.estim0[ind.covariate]==1)
+MCOV0<-MCOV[ind.fix10,i0.omega2,drop=FALSE]
+#if(is.null(dim(MCOV0)) & length(MCOV0)>0) MCOV0<-matrix(MCOV0,ncol=1)
+COV0<-COV[,ind.fix10]
+j0.covariate<-which(LCOV[ind.fix10,i0.omega2]==1)
+flag.fmin<-as.integer(sum(covariate.estim0[1,])>0)
+
+# using several Markov chains
+  chdat<-new(Class="SaemixRepData",data=saemix.data, nb.chains=saemix.options$nb.chains)
+  NM<-chdat["NM"]
+  IdM<-chdat["dataM"]$IdM
+  yM<-chdat["dataM"]$yM
+  XM<-chdat["dataM"][,saemix.data["name.predictors"],drop=FALSE]
+  io<-matrix(data=0,nrow=N,ncol=max(saemix.data["nind.obs"]))
+  for(i in 1:N)
+    io[i,1:saemix.data["nind.obs"][i]]<-1
+  ioM<-do.call(rbind,rep(list(io),saemix.options$nb.chains))
+  ind.ioM <- which(t(ioM)!=0)
+  DYF<-matrix(data=0,nrow=dim(ioM)[2],ncol=dim(ioM)[1])
+
+# Initialisation of phiM
+if(length(i0.omega2)>0) {
+  xmat<-covariate.estim[,i0.omega2]
+  if(is.null(dim(xmat))) xmat<-matrix(xmat,ncol=length(i0.omega2))
+  i0.temp<-which(colSums(xmat)==0)
+  ind0.eta<-i0.omega2[i0.temp]
+} else ind0.eta<-c()
+if(length(ind0.eta)>0) {
+  idx<-1:nb.parameters
+  ind.eta<-idx[-c(ind0.eta)]
+} else ind.eta<-1:nb.parameters
+nb.etas<-length(ind.eta)
+
+itest.phi<-1:NM
+ltest.phi<-length(itest.phi)
+phiM<-matrix(data=0,nrow=NM,ncol=nb.parameters)
+etaM<-matrix(data=0,nrow=NM,ncol=nb.etas)
+
+mean.phiM<-do.call(rbind,rep(list(mean.phi),saemix.options$nb.chains))
+kt<-0
+fixed.psi<-fixedpsi.ini
+omega<-saemix.model["omega.init"]
+chol.omega<-try(chol(omega[ind.eta,ind.eta]),silent=TRUE)
+if(class(chol.omega)=="try-error") {
+  chol.omega<-saemix.model["omega.init"][ind.eta,ind.eta]<-omega[ind.eta, ind.eta]<-diag(nrow=length(ind.eta),ncol=length(ind.eta))
+  cat("Problem inverting covariance matrix, setting initial Omega to diagonal.\n")
+}
+
+# Find a valid set of parameters wrt to the structural.model.
+# Any parameter set that does not generate NaN, inf or imaginary numbers
+# will satisfy this criteria.
+phiMc<-mean.phiM
+while (ltest.phi>0) {
+    kt<-kt+1
+    if (kt==100) 
+        stop("stats:fit.saemix:FailedInitialParameterGuess\nFailed to find a valid initial parameter guess\n")
+    end   
+    etaMc<-0.5*matrix(rnorm(NM*nb.etas),ncol=nb.etas)%*%chol.omega
+    phiMc[,ind.eta]<-mean.phiM[,ind.eta]+etaMc
+    etaM[itest.phi,]<-etaMc[itest.phi,]
+    phiM[itest.phi,]<-phiMc[itest.phi,]
+    psiM<-transphi(phiM,saemix.model["transform.par"])
+    fpred<-structural.model(psiM, IdM, XM)
+    inan<-(is.na(fpred)+is.infinite(fpred)+(Im(fpred)!=0))
+    itest.phi<-unique(IdM[inan])
+    ltest.phi<-length(itest.phi)
+}
+
+# initialization of the sufficient statistics
+phi<-array(data=0,dim=c(N,nb.parameters, saemix.options$nb.chains))
+statphi1<-0
+statphi2<-0
+statphi3<-0
+statrese<-0
+
+############################################
+#  The Algorithm
+
+omega.eta<-omega[ind.eta,ind.eta]
+diag.omega<-diag(omega)
+domega2<-do.call(cbind,rep(list((sqrt(diag(omega.eta)))*saemix.options$rw.ini),nb.etas))
+VK<-rep(c(1:nb.etas),2)
+
+Uargs<-list(i0.omega2=i0.omega2,MCOV0=MCOV0,COV0=COV0,j0.covariate=j0.covariate,
+nmc=saemix.options$nb.chains,IdM=IdM,XM=XM,structural.model=structural.model,
+transform.par=saemix.model["transform.par"],error.model=saemix.model["error.model"], ind.ioM=ind.ioM,yM=yM)

@@ -1,0 +1,34 @@
+Version 1.0 -  January, 2012
+
+ o Bugfixes
+   * Missing covariates previously caused the fit to fail with a unenlightening error message. This has been corrected: now when covariates enter the model, lines with missing covariates are removed; this may cause some individuals to be removed from the dataset altogether if the corresponding covariates are missing entirely. 
+    * A bug has been corrected which caused the call to saemix to fail when the dataset included covariates with values changing within an individual; a warning message has been added to inform the user that only the first value of the covariate is used in the computations
+    * The computation of individual weighted and conditional weighted residuals with an exponential error model has been corrected.
+    * Asking for population fits mistakingly yielded individual fits instead; this has been corrected.
+    * Using an already existing directory now causes the program to overwrite previous results as the warning message implies.
+    * An error in the computation of WRES for subjects with only one observation has been corrected.
+
+ o New features
+   * Binary covariates can now be entered directly as factors; if entered as strings or numbers, they will be converted to factors. Using print() on the result of saemix will show which is the reference class.
+   * Plots of the data now include the option individual=TRUE to plot individual data instead of a spaghetti plot of the whole dataset ; by default a maximum of 12 subjects are plotted, but this may be overuled with the option limit=FALSE
+   * A function subset has been defined for a SaemixData object.
+   * A function logLik has been defined to extract the log-likelihood from a SaemixObject object.
+
+ o Changes
+   * the structure of the SaemixData object has been slightly changed: the data is now included as a data.frame. All user-level functions are unchanged.
+
+Version 0.97 - September 13, 2011
+
+ o Bugfixes
+   * corrected a bug causing the computation of the Fisher Information Matrix (and SEs) to fail when the dataset include subjects with only one observation
+
+Version 0.96 - July 1, 2011
+
+ Corrected version compiling under Windows and MacOS X
+
+ o Bugfixes
+   * modified the section saving the results, using file_test() and dir.create()
+
+Version 0.95 - June 30, 2011
+
+ First version released on CRAN

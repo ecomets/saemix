@@ -1,0 +1,17 @@
+bibentry("Article",
+	author	= "E Comets and A Lavenu and M Lavielle",
+	title	= "{SAEMIX}, an {R} version of the {SAEM} algorithm",
+	journal	= "20$^{th}$ meeting of the {P}opulation {A}pproach {G}roup in {E}urope, Athens, Greece",
+	note	= "Abstr 2173",
+        url          = "http://www.page-meeting.org/default.asp?abstract=2173",
+	year	= "2011",
+
+        textVersion = 
+         paste("Comets E, Lavenu A, Lavielle M. ",
+	"SAEMIX, an R version of the SAEM algorithm. ",
+	"20th meeting of the Population Approach Group in Europe, Athens, Greece ",
+	"(2011), Abstr 2173. http://www.page-meeting.org/default.asp?abstract=2173",sep=""),
+
+         mheader = "To cite saemix in publications use:"             
+        )
+
