@@ -102,21 +102,21 @@ for (kiter in 1:saemix.options$nbiter.tot) { # Iterative portion of algorithm
   	varList$domega2<-varList$domega2[ind.prov,ind.prov,drop=FALSE] # keep in domega2 only indices of parameters with IIV
   	varList$ind0.eta<-Uargs$i0.omega2
   	varList$ind.eta<-1:(Uargs$nb.parameters)  	
-  	print(varList$ind.eta)
   	if(length(varList$ind0.eta)>0) varList$ind.eta<-varList$ind.eta[!(varList$ind.eta %in% varList$ind0.eta)] # update ind.eta, now only parameters with IIV
+  	Uargs$nb.etas<-length(varList$ind.eta)
   	suffStat$statphi1<-0
   	suffStat$statphi2<-0
   	suffStat$statphi3<-0
   }
 
-	# M-step
+	# E-step
   xmcmc<-estep(kiter, Uargs, Dargs, opt, structural.model, mean.phi, varList, DYF, phiM)
   varList<-xmcmc$varList
   DYF<-xmcmc$DYF
   phiM<-xmcmc$phiM
   #  psiM<-transphi(phiM,saemix.model["transform.par"])
   
-  # E-step
+  # M-step
   if(opt$stepsize[kiter]>0) {
 ############# Stochastic Approximation
   	xstoch<-mstep(kiter, Uargs, Dargs, opt, structural.model, DYF, phiM, varList, phi, betas, suffStat)

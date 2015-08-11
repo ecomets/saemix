@@ -1,42 +1,43 @@
 #####################################################################################
 # Library
-setwd("/home/eco/work/monolix/rversion/current/libcov")
+setwd("/home/eco/work/monolix/rversion/current/saemix")
 
 ############################
 # Defining generic for new methods
-source("covsaemix/R/global.R")
+source("devsaemix/R/global.R")
 
 ############################
 # SaemixData
-source("covsaemix/R/SaemixData.R")
+source("devsaemix/R/SaemixData.R")
 
 # SaemixRes
-source("covsaemix/R/SaemixRes.R")
+source("devsaemix/R/SaemixRes.R")
 
 # SaemixModel
-source("covsaemix/R/SaemixModel.R")
+source("devsaemix/R/SaemixModel.R")
 
 # SaemixObject
-source("covsaemix/R/SaemixObject.R")
+source("devsaemix/R/SaemixObject.R")
 
 # Functions
-source("covsaemix/R/func_main.R")
-source("covsaemix/R/func_aux.R")
-source("covsaemix/R/func_plots.R")
-source("covsaemix/R/compute_LL.R")
-source("covsaemix/R/main_initialiseMainAlgo.R")
-source("covsaemix/R/main_estep.R")
-source("covsaemix/R/main_mstep.R")
+source("devsaemix/R/func_main.R")
+source("devsaemix/R/func_aux.R")
+source("devsaemix/R/func_plots.R")
+source("devsaemix/R/compute_LL.R")
+source("devsaemix/R/main_initialiseMainAlgo.R")
+source("devsaemix/R/main_estep.R")
+source("devsaemix/R/main_mstep.R")
 
 # Toggle save feature
 save.results<-TRUE
-save.dir<-"demo"
+save.dir<-"Demo"
+if(save.results & !file_test("-d",save.dir)) dir.create(save.dir)
 
 #####################################################################################
 # Theophylline
 
 # Doc
-theo.saemix<-read.table("covsaemix/data/theo.saemix.tab",header=T,na=".")
+theo.saemix<-read.table("devsaemix/data/theo.saemix.tab",header=T,na=".")
 saemix.data<-saemixData(name.data=theo.saemix,header=TRUE,sep=" ",na=NA, name.group=c("Id"),name.predictors=c("Dose","Time"),name.response=c("Concentration"),name.covariates=c("Weight","Sex"),units=list(x="hr",y="mg/L",covariates=c("kg","-")), name.X="Time")
 
 model1cpt<-function(psi,id,xidep) { 
@@ -67,7 +68,7 @@ cov.fit<-saemix(saemix.model,saemix.data,estonly)
 fim.saemix(cov.fit)
 
 # Changing gender to M/F
-theo.saemix<-read.table("covsaemix/data/theo.saemix.tab",header=T,na=".")
+theo.saemix<-read.table("devsaemix/data/theo.saemix.tab",header=T,na=".")
 theo.saemix$Sex<-ifelse(theo.saemix$Sex==1,"M","F")
 saemix.data<-saemixData(name.data=theo.saemix,header=TRUE,sep=" ",na=NA, name.group=c("Id"),name.predictors=c("Dose","Time"),name.response=c("Concentration"),name.covariates=c("Weight","Sex"),units=list(x="hr",y="mg/L",covariates=c("kg","-")), name.X="Time")
 
@@ -77,7 +78,7 @@ saemix.options<-list(seed=39546,save=save.results,save.graphs=save.results,direc
 cov.fit2<-saemix(saemix.model,saemix.data,saemix.options)
 
 # One missing covariate
-theo.saemix<-read.table("covsaemix/data/theo.saemix.tab",header=T,na=".")
+theo.saemix<-read.table("devsaemix/data/theo.saemix.tab",header=T,na=".")
 theo.saemix$Sex<-ifelse(theo.saemix$Sex==1,"M","F")
 theo.saemix$Weight[theo.saemix$Id==3]<-NA
 saemix.data<-saemixData(name.data=theo.saemix,header=TRUE,sep=" ",na=NA, name.group=c("Id"),name.predictors=c("Dose","Time"),name.response=c("Concentration"),name.covariates=c("Weight","Sex"),units=list(x="hr",y="mg/L",covariates=c("kg","-")), name.X="Time")
@@ -92,8 +93,8 @@ summary(cov.fit3@data) # Check 11 subjects
 #####################################################################################
 # Simulated PD data
 
-PD1.saemix<-read.table("covsaemix/data/PD1.saemix.tab",header=T)
-PD2.saemix<-read.table("covsaemix/data/PD2.saemix.tab",header=T)
+PD1.saemix<-read.table("devsaemix/data/PD1.saemix.tab",header=T)
+PD2.saemix<-read.table("devsaemix/data/PD2.saemix.tab",header=T)
 saemix.data<-saemixData(name.data=PD1.saemix,header=TRUE,name.group=c("subject"),name.predictors=c("dose"),name.response=c("response"),name.covariates=c("gender"), units=list(x="mg",y="-",covariates=c("-")))
 
 modelemax<-function(psi,id,xidep) {
@@ -136,7 +137,7 @@ wstat<-(-2)*(fit1["results"]["ll.is"]-fit2["results"]["ll.is"])
 cat("LRT test for covariate effect on EC50: p-value=",1-pchisq(wstat,1),"\n")
 
 # Dataset with only one point for some subjects and one subject with only NA
-PD1.saemix<-read.table("covsaemix/data/PD1.saemix.tab",header=T)
+PD1.saemix<-read.table("devsaemix/data/PD1.saemix.tab",header=T)
 ione<-c(75,83,95)
 isamp<-c()
 for(i in ione) {
@@ -156,7 +157,7 @@ fit1.bis@results@fixed.effects
 
 #####################################################################################
 #### Exponential error model
-saemix.data1<-saemixData(name.data="covsaemix/data/PD1.saemix.tab",header=TRUE, name.group=c("subject"),name.predictors=c("dose"),name.response=c("response"), name.covariates=c("gender"), units=list(x="mg",y="-",covariates="-"))
+saemix.data1<-saemixData(name.data="devsaemix/data/PD1.saemix.tab",header=TRUE, name.group=c("subject"),name.predictors=c("dose"),name.response=c("response"), name.covariates=c("gender"), units=list(x="mg",y="-",covariates="-"))
 
 modelemax<-function(psi,id,xidep) {
 	# input:
@@ -188,7 +189,7 @@ plot(saemix.fit1,plot.type="vpc")
 #####################################################################################
 # Weight gain of cows
 
-cow.saemix<-read.table("covsaemix/data/cow.saemix.tab",header=T)
+cow.saemix<-read.table("devsaemix/data/cow.saemix.tab",header=T)
 saemix.data<-saemixData(name.data=cow.saemix,header=TRUE,name.group=c("cow"), name.predictors=c("time"),name.response=c("weight"),name.covariates=c("birthyear","twin","birthrank"),units=list(x="days",y="kg",covariates=c("yr","-","-")))
 
 growthcow<-function(psi,id,xidep) {
@@ -217,7 +218,7 @@ saemix.fit<-saemix(saemix.model,saemix.data,saemix.options)
 #####################################################################################
 # Yield
 
-yield.saemix<-read.table("covsaemix/data/yield.saemix.tab",header=T)
+yield.saemix<-read.table("devsaemix/data/yield.saemix.tab",header=T)
 saemix.data<-saemixData(name.data=yield.saemix,header=TRUE,name.group=c("site"),
   name.predictors=c("dose"),name.response=c("yield"),
   name.covariates=c("soil.nitrogen"),units=list(x="kg/ha",y="t/ha",

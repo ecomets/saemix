@@ -1,7 +1,36 @@
 ############################### Initialising main algorithm #############################
 initialiseMainAlgo<-function(saemix.data,saemix.model,saemix.options) {
 	# Function to reformat covariance structure and initialise lists used in the main algorithm
-	
+  # Input: data, model and options
+  # Output:
+  ### saemix.model: added elements betaest, covariate model, indices (); modified/formatted psi0 adjusting to the nb of covariates
+  ### Dargs: data elements - passed on to functions, unchanged
+  ### Uargs: list of indices and variables (fixed) - passed on to functions, unchanged
+  ### varList: variability-related elements - passed to functions and optimised
+  ### opt: list of options and settings (fixed) - passed on to functions, unchanged
+  ### DYF: used for the acceptance/rejection algorithm
+  ### parameters optimised during the fit: phiM, mean.phi, betas, fuxedpsi.ini
+  ### allpar0: array holding the successive values of population parameters
+
+# Elements of the lists
+#   Dargs<-list(IdM=IdM, XM=XM, yM=yM, NM=NM, N=N, nobs=saemix.data["ntot.obs"],
+#               yobs=saemix.data["data"][,saemix.data["name.response"]],transform.par=saemix.model["transform.par"],
+#               error.model=saemix.model["error.model"],structural.model=structural.model)
+#   Uargs<-list(nchains=saemix.options$nb.chains,nb.parameters=nb.parameters, nb.betas=nb.betas, nb.etas=nb.etas, 
+#               nb.parest=nb.parest,indx.betaC=indx.betaC, indx.betaI=indx.betaI, ind.res=ind.res,
+#               indest.omega=indest.omega, i0.omega2=i0.omega2, i1.omega2=i1.omega2,	j.covariate=j.covariate, 
+#               ind.fix10=ind.fix10, ind.fix11=ind.fix11, ind.fix1=ind.fix1, ind.fix0=ind.fix0,
+#               MCOV0=MCOV0, COV=COV, COV0=COV0, COV1=COV1, LCOV=LCOV, COV2=COV2, dstatCOV=dstatCOV, 
+#               Mcovariates=Mcovariates, ind.ioM=ind.ioM)
+#   varList<-list(pres=pres,ind0.eta=ind0.eta,ind.eta=ind.eta,omega=omega, MCOV=MCOV,
+#                 domega2=do.call(cbind,rep(list((sqrt(mydiag(omega.eta)))*saemix.options$rw.ini),nb.etas)),diag.omega=mydiag(omega))
+#   opt<-list(stepsize.rw=saemix.options$stepsize.rw,stepsize=stepsize,
+#             proba.mcmc=saemix.options$proba.mcmc,nbiter.mcmc=saemix.options$nbiter.mcmc,
+#             nbiter.sa=saemix.options$nbiter.sa,alpha1.sa=saemix.options$alpha.sa,
+#             alpha0.sa=10^(-3/saemix.options$nbiter.sa),nbiter.saemix=saemix.options$nbiter.saemix,
+#             maxim.maxiter=saemix.options$maxim.maxiter,flag.fmin=flag.fmin)
+  
+  
 	structural.model<-saemix.model["model"]
 	nb.parameters<-saemix.model["nb.parameters"]
 	N<-saemix.data["N"]
@@ -209,11 +238,11 @@ initialiseMainAlgo<-function(saemix.data,saemix.model,saemix.options) {
 	nb.parest<-sum(covariate.estim)+ sum(saemix.model["covariance.model"][upper.tri(saemix.model["covariance.model"], diag=TRUE)])+1+as.integer(saemix.model["error.model"]=="combined")
 	
 	Uargs<-list(nchains=saemix.options$nb.chains,nb.parameters=nb.parameters, nb.betas=nb.betas, nb.etas=nb.etas, 
-							nb.parest=nb.parest,indx.betaC=indx.betaC, indx.betaI=indx.betaI, ind.res=ind.res,
-							indest.omega=indest.omega, i0.omega2=i0.omega2, i1.omega2=i1.omega2,	j.covariate=j.covariate, 
-							ind.fix10=ind.fix10, ind.fix11=ind.fix11, ind.fix1=ind.fix1, ind.fix0=ind.fix0,
-							MCOV0=MCOV0, COV=COV, COV0=COV0, COV1=COV1, LCOV=LCOV, COV2=COV2, dstatCOV=dstatCOV, 
-							Mcovariates=Mcovariates, ind.ioM=ind.ioM)
+				nb.parest=nb.parest,indx.betaC=indx.betaC, indx.betaI=indx.betaI, ind.res=ind.res,indest.omega=indest.omega,
+				i0.omega2=i0.omega2, i1.omega2=i1.omega2,j.covariate=j.covariate, j0.covariate=j0.covariate,
+				ind.fix10=ind.fix10, ind.fix11=ind.fix11, ind.fix1=ind.fix1, ind.fix0=ind.fix0,
+				MCOV0=MCOV0, COV=COV, COV0=COV0, COV1=COV1, LCOV=LCOV, COV2=COV2, dstatCOV=dstatCOV, 
+				Mcovariates=Mcovariates, ind.ioM=ind.ioM)
 	# Variability-related elements
 	omega.eta<-omega[ind.eta,ind.eta] # IIV matrix for estimated parameters
 	varList<-list(pres=pres,ind0.eta=ind0.eta,ind.eta=ind.eta,omega=omega, MCOV=MCOV,

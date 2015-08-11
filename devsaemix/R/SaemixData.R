@@ -669,6 +669,7 @@ setMethod("show","SaemixData",
       }
     }
     if(length(object@data)>0) {
+      if(object@N>0) cat(object@ntot.obs,"    observations in",object@N,"subjects\n")
       cat("First lines of data:\n")
       nrowShow <- min (10 , nrow(object@data ))
       print(object@data[1:nrowShow,-c(1)])

@@ -24,9 +24,9 @@ mstep<-function(kiter, Uargs, Dargs, opt, structural.model, DYF, phiM, varList, 
 	for(k in 1:Uargs$nchains) phi[,,k]<-phiM[((k-1)*Dargs$N+1):(k*Dargs$N),]
 	# overall speed similar
 	#    phi<-aperm(array(phiM,c(N,nchains,3)),c(1,3,2))
-	stat1<-apply(phi[,varList$ind.eta,,drop=FALSE],c(1,2),sum) # sommer sur les composantes ind.eta de phi, ? travers la 3?me dimension
+	stat1<-apply(phi[,varList$ind.eta,,drop=FALSE],c(1,2),sum) # sum on columns ind.eta of phi, across 3rd dimension
 	stat2<-matrix(data=0,nrow=nb.etas,ncol=nb.etas)
-	stat3<-apply(phi**2,c(1,2),sum) # somme sur phi**2, ? travers la 3?me dimension
+	stat3<-apply(phi**2,c(1,2),sum) #  sum on phi**2, across 3rd dimension
 	statr<-0
 	for(k in 1:Uargs$nchains) {
 		phik<-phi[,varList$ind.eta,k]
@@ -91,7 +91,7 @@ mstep<-function(kiter, Uargs, Dargs, opt, structural.model, DYF, phiM, varList, 
 		varList$pres[2]<-sqrt(sig2)
 	}
 	if (Dargs$error.model=="combined") {
-		# ECO TODO: ? v?rifier (ici fpred<0 donc NaN, et puis que faire si bres<0 ???)
+		# ECO TODO: check and secure (when fpred<0 => NaN, & what happens if bres<0 ???)
 		ABres<-optim(par=varList$pres,fn=ssq,y=Dargs$yM,f=fpred)$par
 		if (kiter<=opt$nbiter.saemix[1]) {
 			varList$pres[1]<-max(varList$pres[1]*opt$alpha1.sa,ABres[1])
