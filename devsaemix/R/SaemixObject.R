@@ -326,9 +326,8 @@ setMethod("print","SaemixObject",
     cat("        save the results to a file: ",x@options$save,"\n")
     cat("        save the graphs to files: ",x@options$save.graphs,"\n")
     if(x@options$save | x@options$save.graphs) cat("        directory where results should be saved: ",x@options$directory,"\n")
-    cat("-----------------------------------\n")
-    cat("----          Results          ----\n")
-    cat("-----------------------------------\n")
+    cat("----------------------------------------------------\n")
+    cat("----                  Results                   ----\n")
     print(x@results)
   }
 )
@@ -389,9 +388,8 @@ setMethod("show","SaemixObject",
     cat("-----------------------------------\n")
   }
   if(length(object@results@fixed.effects)>0) {
-    cat("-----------------------------------------\n")
-    cat("----              Results            ----\n")
-    cat("-----------------------------------------\n")
+    cat("----------------------------------------------------\n")
+    cat("----                  Results                   ----\n")
     show(object@results)
   }}
 )
@@ -460,9 +458,8 @@ setMethod("showall","SaemixObject",
     cat("        size of confidence interval: ",object@options$ipar.rmcmc,"\n")
     cat("-----------------------------------\n")
     if(length(object@results@fixed.effects)>0) {
-      cat("-----------------------------------------\n")
-      cat("----              Results            ----\n")
-      cat("-----------------------------------------\n")
+      cat("----------------------------------------------------\n")
+      cat("----                  Results                   ----\n")
       show(object@results)
     }
   }

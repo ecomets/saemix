@@ -36,9 +36,15 @@ if(save.results & !file_test("-d",save.dir)) dir.create(save.dir)
 #####################################################################################
 # Theophylline
 
-# Doc
+# Data - changing gender to M/F
 theo.saemix<-read.table("devsaemix/data/theo.saemix.tab",header=T,na=".")
+theo.saemix$Sex<-ifelse(theo.saemix$Sex==1,"M","F")
 saemix.data<-saemixData(name.data=theo.saemix,header=TRUE,sep=" ",na=NA, name.group=c("Id"),name.predictors=c("Dose","Time"),name.response=c("Concentration"),name.covariates=c("Weight","Sex"),units=list(x="hr",y="mg/L",covariates=c("kg","-")), name.X="Time")
+
+
+# Doc
+# theo.saemix<-read.table("devsaemix/data/theo.saemix.tab",header=T,na=".")
+# saemix.data<-saemixData(name.data=theo.saemix,header=TRUE,sep=" ",na=NA, name.group=c("Id"),name.predictors=c("Dose","Time"),name.response=c("Concentration"),name.covariates=c("Weight","Sex"),units=list(x="hr",y="mg/L",covariates=c("kg","-")), name.X="Time")
 
 model1cpt<-function(psi,id,xidep) { 
 	dose<-xidep[,1]
@@ -53,7 +59,10 @@ model1cpt<-function(psi,id,xidep) {
 # Default model, no covariate
 saemix.model<-saemixModel(model=model1cpt,description="One-compartment model with first-order absorption",psi0=matrix(c(1.,20,0.5,0.1,0,-0.01),ncol=3,byrow=TRUE, dimnames=list(NULL, c("ka","V","CL"))),transform.par=c(1,1,1))
 saemix.options<-list(seed=632545,save=save.results,save.graphs=save.results,directory=file.path(save.dir,"theoNoCov"))
-saemix.fit<-saemix(saemix.model,saemix.data,saemix.options)
+
+Rprof("Demo/theoCF1cpt.out")
+theo.nocov<-saemix(saemix.model,saemix.data,saemix.options)
+Rprof(NULL)
 
 plot(saemix.fit,plot.type="individual")
 
@@ -89,6 +98,131 @@ saemix.options<-list(seed=39546,save=save.results,save.graphs=save.results,direc
 cov.fit3<-saemix(saemix.model,saemix.data,saemix.options)
 summary(cov.fit3)
 summary(cov.fit3@data) # Check 11 subjects
+
+#####################################################################################
+# Theophylline with ODE model
+library(deSolve)
+
+# Data - changing gender to M/F
+theo.saemix<-read.table("devsaemix/data/theo.saemix.tab",header=T,na=".")
+theo.saemix$Sex<-ifelse(theo.saemix$Sex==1,"M","F")
+data.theo<-saemixData(name.data=theo.saemix,header=TRUE,sep=" ",na=NA, name.group=c("Id"),name.predictors=c("Dose","Time"),name.response=c("Concentration"),name.covariates=c("Weight","Sex"),units=list(x="hr",y="mg/L",covariates=c("kg","-")), name.X="Time")
+
+########################
+# ad-hoc implementation
+# ODE system for 1st order elimination - setting up deSolve
+ode1cpt<-function(Time, State, Pars) {
+  with(as.list(c(State, Pars)), {
+    dGut <- (-ka)*Gut
+    dCentral <- ka*Gut - CL/V*Central
+    return(list(c(dGut, dCentral)))
+  })
+}
+
+# testing ode1cpt
+par1cpt<-c(ka=1.53,   # first-order absorption
+         V=31.5,   # volume of central compartment
+         CL=4.1)   # clearance
+
+modelODE1cpt<-function(psi,id,xidep) { 
+  ypred<-rep(0,length(id))
+  yini<-c(Gut=0,Central=0)
+  for(isuj in unique(id)) {
+    param<-c(ka=psi[isuj,1],V=psi[isuj,2],CL=psi[isuj,3])
+    yini[1]<-xidep[match(isuj,id),1] # Dose
+    tim<-c(0,xidep[id==isuj,2]) # Need to integrate from time=0
+    out<-ode(yini,tim,ode1cpt,param)
+    ypred[id==isuj]<-out[-c(1),3]/param[2]
+  }
+  return(ypred)
+}
+
+yini<-c(Gut=320,Central=0)
+xtim<-seq(0,25,by=0.2)
+out1<-ode(yini,xtim,ode1cpt,par1cpt)
+
+plot(data.theo)
+lines(xtim,out1[,3]/par1cpt[2],lwd=3,col="DarkRed")
+
+yini[1]*param[1]/(param[2]*(param[1]-param[3]/param[2]))*(exp(-param[3]/param[2]*tim)-exp(-param[1]*tim))
+
+# Compare saemix model functions for 1cpt and ODE- should get same results
+xidep<-saemix.data@data[,c("Dose","Time")]
+id<-saemix.data@data[,c("Id")]
+psi<-exp(theo.nocov@results@phi)
+
+ypred.ode<-modelODE1cpt(psi,id,xidep)
+ypred.cf<-model1cpt(psi,id,xidep)
+
+plot(ypred.ode,ypred.cf)
+abline(0,1)
+summary(ypred.ode-ypred.cf)
+summary((ypred.ode-ypred.cf)/(ypred.ode+ypred.cf)*2)
+
+########################
+# saemix run
+model.ode1cpt<-saemixModel(model=modelODE1cpt,description="One-compartment model with first-order absorption, ODE",psi0=matrix(c(1.,20,0.5,0.1,0,-0.01),ncol=3,byrow=TRUE, dimnames=list(NULL, c("ka","V","CL"))),transform.par=c(1,1,1))
+saemix.options<-list(seed=632545,save=save.results,save.graphs=save.results,directory=file.path(save.dir,"theoODE1cpt"))
+
+Rprof("Demo/theoODE1cpt.out")
+theoODE.fit<-saemix(model.ode1cpt,data.theo,saemix.options)
+Rprof(NULL)
+
+# Comparing run times w/r closed-form solution
+system("R CMD Rprof Demo/theoCF1cpt.out")
+system("R CMD Rprof Demo/theoODE1cpt.out")
+
+########################
+# MM model
+# ODE system for MM
+odeMM<-function(Time, State, Pars) {
+  with(as.list(c(State, Pars)), {
+    dGut <- (-ka)*Gut
+    dCentral <- ka*Gut - Vm*Central/(Km/Vc+Central)
+    return(list(c(dGut, dCentral)))
+  })
+}
+
+parMM<-c(ka=1.5,   # first-order absorption
+         Vc=31.5,   # volume of central compartment
+         Vm=15,   # 
+         Km=5)   # 
+
+# testing odeMM
+yini<-c(Gut=320,Central=0)
+outMM<-ode(yini,xtim,odeMM,parMM)
+plot(saemix.data)
+lines(xtim,out1[,3]/par1cpt[2],lwd=3,col="DarkRed")
+lines(xtim,outMM[,3]/parMM[2],lwd=3,col="DarkBlue")
+
+# saemix function
+modelMM<-function(psi,id,xidep) { 
+  ypred<-rep(0,length(id))
+  yini<-c(Gut=0,Central=0)
+  for(isuj in unique(id)) {
+    parMM<-c(ka=psi[isuj,1],Vc=psi[isuj,2],Vm=psi[isuj,3],Km=psi[isuj,4])
+    yini[1]<-xidep[match(isuj,id),1] # Dose
+    tim<-c(0,xidep[id==isuj,2]) # Need to integrate from time=0
+    out<-ode(yini,tim,odeMM,parMM)
+    ypred[id==isuj]<-out[-c(1),3]/parMM[2]
+  }
+  return(ypred)
+}
+
+# Testing modelMM
+xidep<-saemix.data@data[,c("Dose","Time")]
+id<-saemix.data@data[,c("Id")]
+psi<-exp(theo.nocov@results@phi)
+psi<-cbind(psi,psi[,3]*4)
+psi[,3]<-psi[,2]/1.5
+
+ypred<-modelMM(psi,id,xidep)
+plot(saemix.data)
+lines(xidep[,2],ypred,col='DarkRed',lwd=2)
+
+# MM model with saemix
+saemix.model<-saemixModel(model=modelMM,description="Michaelis-Menten elimination with deSolve",psi0=matrix(c(1.,20,15,4,0,0,0,-0.01),ncol=4,byrow=TRUE, dimnames=list(NULL, c("ka","V","Vm","Km"))),transform.par=c(1,1,1,1),error.model="combined")
+theoMM.fit<-saemix(saemix.model,saemix.data,saemix.options)
 
 #####################################################################################
 # Simulated PD data
