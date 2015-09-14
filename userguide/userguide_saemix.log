@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=latex 2015.1.30)  14 AUG 2015 18:59
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=latex 2015.1.30)  10 SEP 2015 16:57
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -287,9 +287,7 @@ Type  H <return>  for immediate help.
                                                   
 l.4319 \ProcessKeyvalOptions{Hyp}
                                  
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
+? 
 Package hyperref Info: Option `colorlinks' set `true' on input line 4319.
 Package hyperref Info: Hyper figures OFF on input line 4443.
 Package hyperref Info: Link nesting OFF on input line 4448.
@@ -408,13 +406,6 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
 
  [4] (./intro_saem.tex
 Chapter 1.
-
-LaTeX Warning: Citation `R' on page 5 undefined on input line 21.
-
-
-LaTeX Warning: Citation `MonolixUserGuide' on page 5 undefined on input line 21
-.
-
 [5
 
 ]
@@ -424,100 +415,16 @@ File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 25.
-
-
-LaTeX Warning: Citation `Delyon' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `samson_jspi06' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `Kuhn01' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `Kuhn05' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `Makowski06' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `Jaffrezic06' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `Comets07' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `Lavielle07' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `samson_csda06' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `samson_sim06a' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `Bertrand09' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `page06b' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `page05a' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `page03' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `page04a' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `page06c' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `page05b' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `page05c' on page 6 undefined on input line 37.
-
-
-LaTeX Warning: Citation `Davidian95' on page 6 undefined on input line 43.
-
-
-LaTeX Warning: Citation `davgil1' on page 6 undefined on input line 43.
-
-
-LaTeX Warning: Citation `PinheiroBates00' on page 6 undefined on input line 43.
-
-
-[6] [7] [8] [9]) [10] (./methodo_saem.tex
+ [6] [7] [8]
+[9]) [10] (./methodo_saem.tex
 Chapter 2.
-
-LaTeX Warning: Citation `Dempster77' on page 11 undefined on input line 10.
-
-
-LaTeX Warning: Citation `Wu83' on page 11 undefined on input line 10.
-
-
-LaTeX Warning: Citation `Delyon' on page 11 undefined on input line 12.
-
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [11
 
 ]
-
-LaTeX Warning: Citation `Delyon' on page 12 undefined on input line 25.
-
-[12] [13]
-
-LaTeX Warning: Citation `Kuhn01' on page 14 undefined on input line 101.
-
-[14] [15] [16] [17]
-
-LaTeX Warning: Citation `Louis82' on page 18 undefined on input line 196.
-
-[18] [19] [20]
+[12] [13] [14] [15] [16] [17] [18] [19] [20]
 Underfull \vbox (badness 4217) has occurred while \output is active []
 
  [21]
@@ -561,22 +468,14 @@ Overfull \hbox (36.86163pt too wide) in alignment at lines 526--532
 
 [27] [28] [29
 
-] [30] [31]
-
-LaTeX Warning: Citation `Raftery95' on page 32 undefined on input line 684.
-
-[32]
+] [30] [31] [32]
 Overfull \hbox (19.06741pt too wide) in paragraph at lines 701--702
 []\OT1/cmr/m/n/10.95 The Pop-u-la-tion Weighted Resid-u-als $(\OML/cmm/m/it/10.
 95 PWRES[]\OT1/cmr/m/n/10.95 )$, the In-di-vid-ual Weighted Resid-u-als $(\OML/
 cmm/m/it/10.95 IWRES[]\OT1/cmr/m/n/10.95 )$
  []
 
-[33] [34]
-
-LaTeX Warning: Citation `CometsCMPB08' on page 35 undefined on input line 734.
-
-[35] [36]
+[33] [34] [35] [36]
 Overfull \hbox (38.16402pt too wide) in paragraph at lines 836--837
 []|\OT1/cmr/m/n/10.95 c("res.vs.x","res.vs.pred",| 
  []
@@ -588,15 +487,6 @@ Overfull \hbox (33.4494pt too wide) in paragraph at lines 837--838
 
 [37] [38] [39]) [40] (./examples_saem.tex
 Chapter 3.
-
-LaTeX Warning: Citation `NONMEM' on page 41 undefined on input line 25.
-
-
-LaTeX Warning: Citation `Davidian95' on page 41 undefined on input line 27.
-
-
-LaTeX Warning: Citation `Pinheiro95' on page 41 undefined on input line 27.
-
 [41
 
 ]
@@ -786,11 +676,7 @@ ix.plot.options us-ing the func-tion saemix.plot.setoptions.
 
 [63]
 File: figs/cow_indivfit4.eps Graphic file (type eps)
- <figs/cow_indivfit4.eps>
-
-LaTeX Warning: Citation `nlme' on page 64 undefined on input line 656.
-
-[64]
+ <figs/cow_indivfit4.eps> [64]
 File: figs/oxboys_rawdata.eps Graphic file (type eps)
  <figs/oxboys_rawdata.eps>
 Overfull \hbox (10.39963pt too wide) in paragraph at lines 710--710
@@ -895,9 +781,6 @@ Overfull \hbox (4.65094pt too wide) in paragraph at lines 862--862
 
 ) [72] (./classS4.tex
 Chapter 4.
-
-LaTeX Warning: Citation `Genolini' on page 73 undefined on input line 3.
-
 [73
 
 ] [74] [75] [76] [77] [78]
@@ -912,21 +795,25 @@ Overfull \hbox (33.39438pt too wide) in paragraph at lines 154--154
 /L",covariates=c("kg","-")),[] 
  []
 
-) [79]
-No file userguide_saemix.bbl.
+) [79] (./userguide_saemix.bbl [80
+
+]
+
+LaTeX Font Warning: Font shape `OT1/cmss/m/it' in size <10.95> not available
+(Font)              Font shape `OT1/cmss/m/sl' tried instead on input line 7.
+
+[81] [82])
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 226.
+ [83]
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 226.
-(./userguide_saemix.aux)
+ (./userguide_saemix.aux)
 Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 226.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 226.
 Package rerunfilecheck Info: File `userguide_saemix.out' has not changed.
-(rerunfilecheck)             Checksum: 6C400E38022C1B5423E6F296606BE8D5;3314.
+(rerunfilecheck)             Checksum: DDE9318B1469DF60B00C7BC1CC0F48F0;3364.
 
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
-
-
-LaTeX Warning: There were undefined references.
 
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 226.
  )
@@ -935,12 +822,12 @@ Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 226.
 ### simple group (level 1) entered at line 251 ({)
 ### bottom level 
 Here is how much of TeX's memory you used:
- 6373 strings out of 495000
- 90096 string characters out of 6180254
- 194766 words of memory out of 5000000
- 9475 multiletter control sequences out of 15000+600000
- 18876 words of font info for 70 fonts, out of 8000000 for 9000
+ 6381 strings out of 495000
+ 90212 string characters out of 6180254
+ 195853 words of memory out of 5000000
+ 9480 multiletter control sequences out of 15000+600000
+ 19232 words of font info for 71 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  32i,16n,45p,1184b,508s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on userguide_saemix.dvi (79 pages, 300896 bytes).
+Output written on userguide_saemix.dvi (83 pages, 326424 bytes).

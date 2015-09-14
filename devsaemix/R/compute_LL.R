@@ -1,5 +1,65 @@
 ###########################	Likelihood by IS	#############################
 
+
+
+#' Log-likelihood using Importance Sampling
+#' 
+#' Estimate the log-likelihood using Importance Sampling
+#' 
+#' The likelihood of the observations is estimated without any approximation
+#' using a Monte-Carlo approach (see documentation).
+#' 
+#' @param saemixObject an object returned by the \code{\link{saemix}} function
+#' @return the log-likelihood estimated by Importance Sampling
+#' @author Emmanuelle Comets <emmanuelle.comets@@inserm.fr>, Audrey Lavenu,
+#' Marc Lavielle.
+#' @seealso
+#' \code{\link{SaemixObject}},\code{\link{saemix}},\code{\link{llgq.saemix}}
+#' @references Kuhn E, Lavielle M. Maximum likelihood estimation in nonlinear
+#' mixed effects models. Computational Statistics and Data Analysis 49, 4
+#' (2005), 1020-1038.
+#' 
+#' Comets E, Lavenu A, Lavielle M. SAEMIX, an R version of the SAEM algorithm.
+#' 20th meeting of the Population Approach Group in Europe, Athens, Greece
+#' (2011), Abstr 2173.
+#' @keywords models
+#' @examples
+#'  
+#' # Running the main algorithm to estimate the population parameters
+#' data(theo.saemix)
+#' saemix.data<-saemixData(name.data=theo.saemix,header=TRUE,sep=" ",na=NA, 
+#'   name.group=c("Id"),name.predictors=c("Dose","Time"),
+#'   name.response=c("Concentration"),name.covariates=c("Weight","Sex"),
+#'   units=list(x="hr",y="mg/L",covariates=c("kg","-")), name.X="Time")
+#' 
+#' model1cpt<-function(psi,id,xidep) { 
+#' 	  dose<-xidep[,1]
+#' 	  tim<-xidep[,2]  
+#' 	  ka<-psi[id,1]
+#' 	  V<-psi[id,2]
+#' 	  CL<-psi[id,3]
+#' 	  k<-CL/V
+#' 	  ypred<-dose*ka/(V*(ka-k))*(exp(-k*tim)-exp(-ka*tim))
+#' 	  return(ypred)
+#' }
+#' saemix.model<-saemixModel(model=model1cpt,
+#'   description="One-compartment model with first-order absorption", 
+#'   psi0=matrix(c(1.,20,0.5,0.1,0,-0.01),ncol=3, byrow=TRUE,
+#'   dimnames=list(NULL, c("ka","V","CL"))),transform.par=c(1,1,1),
+#'   covariate.model=matrix(c(0,1,0,0,0,0),ncol=3,byrow=TRUE),fixed.estim=c(1,1,1),
+#'   covariance.model=matrix(c(1,0,0,0,1,0,0,0,1),ncol=3,byrow=TRUE),
+#'   omega.init=matrix(c(1,0,0,0,1,0,0,0,1),ncol=3,byrow=TRUE),error.model="constant")
+#' 
+#' saemix.options<-list(algorithm=c(1,0,0),seed=632545,save=FALSE,save.graphs=FALSE)
+#' 
+#' # Not run (strict time constraints for CRAN)
+#' # saemix.fit<-saemix(saemix.model,saemix.data,saemix.options)
+#' 
+#' # Estimating the likelihood by importance sampling using the result of saemix 
+#' # & returning the result in the same object
+#' # saemix.fit<-llis.saemix(saemix.fit)
+#' 
+#' @export llis.saemix
 llis.saemix<-function(saemixObject) {
 	# Estimate the log-likelihood via importance Sampling
 	
@@ -98,6 +158,68 @@ llis.saemix<-function(saemixObject) {
 
 ###########################	Likelihood by GQ	#############################
 
+
+
+#' Log-likelihood using Gaussian Quadrature
+#' 
+#' Estimate the log-likelihood using Gaussian Quadrature (multidimensional
+#' grid)
+#' 
+#' The likelihood of the observations is estimated using Gaussian Quadrature
+#' (see documentation).
+#' 
+#' @param saemixObject an object returned by the \code{\link{saemix}} function
+#' @return the log-likelihood estimated by Gaussian Quadrature
+#' @author Emmanuelle Comets <emmanuelle.comets@@inserm.fr>, Audrey Lavenu,
+#' Marc Lavielle.
+#' @seealso
+#' \code{\link{SaemixObject}},\code{\link{saemix}},\code{\link{llis.saemix}}
+#' @references Kuhn E, Lavielle M. Maximum likelihood estimation in nonlinear
+#' mixed effects models. Computational Statistics and Data Analysis 49, 4
+#' (2005), 1020-1038.
+#' 
+#' Comets E, Lavenu A, Lavielle M. SAEMIX, an R version of the SAEM algorithm.
+#' 20th meeting of the Population Approach Group in Europe, Athens, Greece
+#' (2011), Abstr 2173.
+#' @keywords models
+#' @examples
+#'  
+#' # Running the main algorithm to estimate the population parameters
+#' data(theo.saemix)
+#' saemix.data<-saemixData(name.data=theo.saemix,header=TRUE,sep=" ",na=NA, 
+#'   name.group=c("Id"),name.predictors=c("Dose","Time"),
+#'   name.response=c("Concentration"),name.covariates=c("Weight","Sex"),
+#'   units=list(x="hr",y="mg/L",covariates=c("kg","-")), name.X="Time")
+#' 
+#' model1cpt<-function(psi,id,xidep) { 
+#' 	  dose<-xidep[,1]
+#' 	  tim<-xidep[,2]  
+#' 	  ka<-psi[id,1]
+#' 	  V<-psi[id,2]
+#' 	  CL<-psi[id,3]
+#' 	  k<-CL/V
+#' 	  ypred<-dose*ka/(V*(ka-k))*(exp(-k*tim)-exp(-ka*tim))
+#' 	  return(ypred)
+#' }
+#' saemix.model<-saemixModel(model=model1cpt,
+#'   description="One-compartment model with first-order absorption", 
+#'   psi0=matrix(c(1.,20,0.5,0.1,0,-0.01),ncol=3,byrow=TRUE,
+#'   dimnames=list(NULL, c("ka","V","CL"))),transform.par=c(1,1,1), 
+#'   covariate.model=matrix(c(0,1,0,0,0,0),ncol=3,byrow=TRUE),fixed.estim=c(1,1,1),
+#'   covariance.model=matrix(c(1,0,0,0,1,0,0,0,1),ncol=3,byrow=TRUE),
+#'   omega.init=matrix(c(1,0,0,0,1,0,0,0,1),ncol=3,byrow=TRUE), error.model="constant")
+#' 
+#' saemix.options<-list(seed=632545,save=FALSE,save.graphs=FALSE)
+#' 
+#' # Not run (strict time constraints for CRAN)
+#' # saemix.fit<-saemix(saemix.model,saemix.data,saemix.options)
+#' 
+#' # Estimating the likelihood by Gaussian Quadrature using the result of saemix 
+#' # & returning the result in the same object
+#' # saemix.fit<-llgq.saemix(saemix.fit)
+#' 
+#' 
+#' @export llgq.saemix
 llgq.saemix<-function(saemixObject) {
 	# RES = MLXGQ(RES) Estimate the log-likelihood using Gaussian Quadrature (multidimensional grid)
 	nnodes.gq<-saemixObject["options"]$nnodes.gq  # number of nodes on each 1-D grid
@@ -141,6 +263,84 @@ llgq.saemix<-function(saemixObject) {
 	Q<-0
 	for (j in 1:nx) {
 		phi[,i1.omega2] <- a+b*matrix(rep(x[j,],saemix.data["N"]),ncol=nphi1,byrow=TRUE)
+
+
+#' Functions to extract the individual estimates of the parameters and random
+#' effects
+#' 
+#' These three functions are used to access the estimates of individual
+#' parameters and random effects.
+#' 
+#' The psi_i represent the individual parameter estimates. In the SAEM
+#' algorithm, these parameters are assumed to be a transformation of a Gaussian
+#' random vector phi_i, where the phi_i can be written as a function of the
+#' individual random effects (eta_i), the covariate matrix (C_i) and the vector
+#' of fixed effects (mu):
+#' 
+#' phi_i = C_i mu + eta_i
+#' 
+#' More details can be found in the PDF documentation.
+#' 
+#' @aliases psi phi eta
+#' @param object an object returned by the \code{\link{saemix}} function
+#' @param indiv.par a string giving the type of estimate to be used (one of
+#' "map", for the Maximum A Posteriori estimate, or "eap", for conditional
+#' estimate). Defaults to "map"
+#' @return These functions are used to access and output the estimates of
+#' parameters and random effects. When the object passed to the function does
+#' not contain these estimates, they are automatically computed. The object is
+#' then returned (invisibly) with these estimates added to the results.
+#' @author Emmanuelle Comets <emmanuelle.comets@@inserm.fr>, Audrey Lavenu,
+#' Marc Lavielle.
+#' @seealso \code{\link{SaemixData}},\code{\link{SaemixModel}},
+#' \code{\link{SaemixObject}}, \code{\link{saemixControl}},
+#' \code{\link{plot.saemix}}
+#' @references Kuhn E, Lavielle M. Maximum likelihood estimation in nonlinear
+#' mixed effects models. Computational Statistics and Data Analysis 49, 4
+#' (2005), 1020-1038.
+#' 
+#' Comets E, Lavenu A, Lavielle M. SAEMIX, an R version of the SAEM algorithm.
+#' 20th meeting of the Population Approach Group in Europe, Athens, Greece
+#' (2011), Abstr 2173.
+#' @keywords models
+#' @examples
+#' 
+#' data(theo.saemix)
+#' 
+#' saemix.data<-saemixData(name.data=theo.saemix,header=TRUE,sep=" ",na=NA, 
+#'   name.group=c("Id"),name.predictors=c("Dose","Time"),
+#'   name.response=c("Concentration"),name.covariates=c("Weight","Sex"),
+#'   units=list(x="hr",y="mg/L",covariates=c("kg","-")), name.X="Time")
+#' 
+#' model1cpt<-function(psi,id,xidep) { 
+#' 	  dose<-xidep[,1]
+#' 	  tim<-xidep[,2]  
+#' 	  ka<-psi[id,1]
+#' 	  V<-psi[id,2]
+#' 	  CL<-psi[id,3]
+#' 	  k<-CL/V
+#' 	  ypred<-dose*ka/(V*(ka-k))*(exp(-k*tim)-exp(-ka*tim))
+#' 	  return(ypred)
+#' }
+#' 
+#' saemix.model<-saemixModel(model=model1cpt,
+#'   description="One-compartment model with first-order absorption", 
+#'   psi0=matrix(c(1.,20,0.5,0.1,0,-0.01),ncol=3, byrow=TRUE,
+#'   dimnames=list(NULL, c("ka","V","CL"))),transform.par=c(1,1,1),
+#'   covariate.model=matrix(c(0,1,0,0,0,0),ncol=3,byrow=TRUE),fixed.estim=c(1,1,1),
+#'   covariance.model=matrix(c(1,0,0,0,1,0,0,0,1),ncol=3,byrow=TRUE),
+#'   omega.init=matrix(c(1,0,0,0,1,0,0,0,1),ncol=3,byrow=TRUE),error.model="constant")
+#' 
+#' saemix.options<-list(algorithm=c(1,0,0),seed=632545,save=FALSE,save.graphs=FALSE)
+#' 
+#' # Not run (strict time constraints for CRAN)
+#' # saemix.fit<-saemix(saemix.model,saemix.data,saemix.options)
+#' 
+#' # psi(saemix.fit)
+#' # phi(saemix.fit)
+#' # eta(saemix.fit,indiv.par="eap")
+#' 
+#' @export psi
 		psi<-transphi(phi,saemixObject["model"]["transform.par"])
 		f<-saemixObject["model"]["model"](psi, saemix.data["data"][,"index"], xind)
 		if(saemixObject["model"]["error.model"]=="exponential")

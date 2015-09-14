@@ -1,5 +1,108 @@
-
 #######################	   Default plot options (list)	 ########################
+
+#' Function setting the default options for the plots in SAEM
+#' 
+#' This function can be used to create a list containing the default options
+#' and arguments used by the plot functions.
+#' 
+#' A more detailed description of the options set via these lists is provided
+#' in the PDF documentation. The "replace" functions are helper functions used
+#' within the plot functions. saemix.plot.setoptions has more available options
+#' than saemix.data.setoptions since it applies to all possible plots while the
+#' latter only applies to data. 
+#' @description 
+#' \itemize{
+#' \item ablinecol Color of the lines added to the plots (default: "DarkRed")
+#' \item ablinelty Type of the lines added to the plots. Defaults to 2 (dashed line)
+#' \item ablinelwd Width of the lines added to the plots (default: 2)
+#' \item ask A logical value. If TRUE, users will be prompted before each new plot. Defaults to FALSE
+#' \item cex A numerical value giving the amount by which plotting text and symbols should be magnified relative to the default. Defaults to 1 (no magnification)
+#' \item cex.axis Magnification to be used for axis annotation relative to the current setting of 'cex'. Defaults to 1 (no magnification)
+#' \item cex.main Magnification to be used for main titles relative to the current setting of 'cex'. Defaults to 1 (no magnification)
+#' \item cex.lab Magnification to be used for x and y labels relative to the current setting of 'cex'. Defaults to 1 (no magnification)
+#' \item col.fillmed For the VPC plots: color filling the prediction interval for the median. Defaults to "pink"
+#'\item col.fillpi For the VPC plots: color filling the prediction interval for the limits of the prediction interval. Defaults to "slategray1"
+#' \item col.lmed For the VPC plots: color of the line showing the median of the simulated data. Defaults to "indianred4"
+#' \item col.lobs For the VPC plots: color of the lines showing the median, 2.5 and 97.5th percentiles (for a 95% prediction interval). Defaults to "steelblue4"
+#' \item col.lpi For the VPC plots: color of the line showing the boundaries of the prediction intervals. Defaults to "slategray4"
+#' \item col.obs For the VPC plots: color used to plot the observations. Defaults to "steelblue4"
+#' \item cov.name Name of the covariate to be used in the plots. Defaults to the first covariate in the model
+#' \item cov.value Value of the covariate to be used in the plots. Defaults to NA, indicating that the median value of the covariate (for continuous covariates) or the reference category (for categorical covariates) will be used 
+#' \item ilist List of indices of subjects to be included in the individual plots (defaults to all subjects)
+#' \item indiv.par  a string, giving the type of the individual estimates ("map"= conditional mode, "eap"=conditional mean). Defaults to conditional mode
+#' \item lcol Main line color (default: black)
+#' \item line.smooth Type of smoothing when a smoothed line is used in the plot ("m": mean value, "l": linear regression; "s": natural splines). Several options may be combined, for instance "ls" will add both a linear regression line and a line representing the fit of a natural spline. Defaults to "s"
+#' \item lty Line type. Defaults to 1, corresponding to a straight line
+#' \item lty.lmed For the VPC plots: type of the line showing the median of the simulated data. Defaults to 2 (dashed)
+#' \item lty.obs For the VPC plots: type of the line showing the observed data. Defaults to 1
+#' \item lty.lpi For the VPC plots: type of the line showing the boundaries of the simulated data. Defaults to 2 (dashed)
+#' \item lwd Line width (default: 1)
+#' \item lwd.lmed For the VPC plots: thickness of the line showing the median of the simulated data. Defaults to 2
+#' \item lwd.obs For the VPC plots: thickness of the line showing the median and boundaries of the observed data. Defaults to 2
+#' \item lwd.lpi For the VPC plots: thickness of the line showing the boundaries of the simulated data. Defaults to 1
+#' \item par.name Name of the parameter to be used in the plots. Defaults to the first parameter in the model
+#' \item pch Symbol type. Defaults to 20, corresponding to small dots
+#' \item pcol Main symbol color (default: black)
+#' \item range Range (expressed in number of SD) over which to plot the marginal distribution. Defaults to 4, so that the random effects for the marginal distribution is taken over the range [-4 SD; 4 SD]
+#' \item res.plot Type of residual plot ("res.vs.x": scatterplot versus X, "res.vs.pred": scatterplot versus predictions, "hist": histogram, "qqplot": QQ-plot) (default: "res.vs.x")
+#'\item smooth When TRUE, smoothed lines are added in the plots of predictions versus observations (default: FALSE)
+#' \item tit Title of the graph (default: none) 
+#' \item type Type of the plot (as in the \emph{R} plot function. Defaults to "b", so that both lines and symbols are shown
+#' \item units Name of the predictor used in the plots (X). Defaults to the name of the first predictor in the model (saemix.data$names$predictors[1])
+#' \item vpc.bin Number of binning intervals when plotting the VPC (the (vpc.bin-1) breakpoints are taken as the empirical quantiles of the X data). Defaults to 10
+#' \item vpc.interval Size of the prediction intervals.Defaults to 0.95 for the 95\% prediction interval
+#' \item vpc.obs Should the observations be overlayed on the VPC plot. Defaults to TRUE
+#' \item vpc.pi Should prediction bands be computed around the median and the bounds of the prediction intervals for the VPC. Defaults to TRUE
+#' \item xlab Label for the X-axis. Defaults to the name of the X predictor followed by the unit in bracket (eg "Time (hr)")
+#' \item xlim Range for the X-axis. Defaults to NA, indicating that the range is to be set by the plot function
+#' \item xlog A logical value. If TRUE, a logarithmic scale is in use. Defaults to FALSE
+#' \item xname Name of the predictor used in the plots (X)
+#' \item ylab Label for the Y-axis. Defaults to the name of the response followed by the unit in bracket (eg "Concentration (mg/L)" (Default: none)
+#' \item ylim Range for the Y-axis. Defaults to NA, indicating that the range is to be set by the plot function
+#' \item ylog A logical value. If TRUE, a logarithmic scale is in use. Defaults to FALSE
+#' }
+#' 
+#' Plotting a SaemixData object also allows the following options: 
+#' \describe{ 
+#' \item{individual}{ if TRUE, plots separate plots for each individual, otherwise plots a spaghetti plot of all the data. Defaults to FALSE} 
+#' \item{limit}{ for individual plots, plots only a limited number of subjets (nmax). Defaults to TRUE} 
+#' \item{nmax}{ for individual plots, when limit is TRUE, the maximum number of plots to produce. Defaults to 12}
+#' \item{sample}{ for individual plots, if TRUE, randomly samples nmax different subjects to plot. Defaults to FALSE (the first nmax subjects are used in the plots)} 
+#' } 
+#' 
+#' @aliases saemix.plot.setoptions saemix.data.setoptions replace.plot.options replace.data.options
+#' @param saemixObject an object returned by the \code{\link{saemix}} function
+#' @param saemix.data an SaemixData object returned by the
+#' \code{\link{read.saemixData}} function
+#' @param plot.opt current graphic options
+#' @param \dots optional arguments passed to the plots, which will be used to
+#' override the current options defined in plot.opt
+#' @return A list containing the options set at their default value. This list
+#' can be stored in an object and its elements modified to provide suitable
+#' graphs.
+#' @author Emmanuelle Comets \email{emmanuelle.comets@@inserm.fr}, Audrey Lavenu, Marc Lavielle.
+#' @seealso \code{\link{SaemixObject}},\code{\link{saemix}},
+#' \code{\link{saemix.plot.data}}, \code{\link{saemix.plot.convergence}},
+#' \code{\link{saemix.plot.llis}}, \code{\link{saemix.plot.randeff}},
+#' \code{\link{saemix.plot.obsvspred}}, \code{\link{saemix.plot.fits}},
+#' \code{\link{saemix.plot.parcov}}, \code{\link{saemix.plot.distpsi}},
+#' \code{\link{saemix.plot.scatterresiduals}}, \code{\link{saemix.plot.vpc}}
+#' @references Kuhn E, Lavielle M. Maximum likelihood estimation in nonlinear
+#' mixed effects models. Computational Statistics and Data Analysis 49, 4
+#' (2005), 1020-1038.
+#' 
+#' Comets E, Lavenu A, Lavielle M. SAEMIX, an R version of the SAEM algorithm.
+#' 20th meeting of the Population Approach Group in Europe, Athens, Greece
+#' (2011), Abstr 2173.
+#' @keywords plot
+#' @examples
+#' 
+#' # Theophylline example, after a call to fit.saemix (see examples)
+#' # Not run
+#' # sopt<-saemix.plot.setoptions(saemix.fit)
+#' # sopt$ask<-TRUE
+#' 
+#' @export saemix.plot.setoptions
 
 saemix.plot.setoptions<-function(saemixObject) {
 # setting default plot options
@@ -130,6 +233,131 @@ replace.plot.options<-function(plot.opt,...) {
 #####################################################################################
 ###############################	   Wrapper functions  #############################
 
+#' Plots of the results obtained by SAEM
+#' 
+#' Several plots (selectable by the type argument) are currently available:
+#' convergence plot, individual plots, predictions versus observations,
+#' distribution plots, residual plots, VPC.
+#' 
+#' This function plots different graphs related to the algorithm (convergence
+#' plots, likelihood estimation) as well as diagnostic graphs. A description is
+#' provided in the PDF documentation. 
+#' \describe{ 
+#' \item{data}{A spaghetti plot of the data, displaying the observed data y as a function of the regression
+#' variable (eg time for a PK application)} 
+#' \item{convergence}{For each parameter in the model, this plot shows the evolution of the parameter
+#' estimate versus the iteration number} 
+#' \item{likelihood}{Estimation of the likelihood estimated by importance sampling, as a function of the number of
+#' MCMC samples} 
+#' \item{individual.fit}{Individual fits, using the individual parameters with the individual covariates} 
+#' \item{population.fit}{Individual fits, using the population parameters with the individual covariates}
+#' \item{both.fit}{Individual fits, using the population parameters with the individual covariates and the individual parameters with the individual covariates} 
+#' \item{observations.vs.predictions}{Plot of the predictions computed with the population parameters versus the observations (left), and plot of the predictions computed with the individual parameters versus the observations (right)}
+#' \item{residuals.scatter}{Scatterplot of standardised residuals versus the X predictor and versus predictions. These plots are shown for individual and population residuals, as well as for npde when they are available} 
+#' \item{residuals.distribution}{Distribution of standardised residuals, using histograms and QQ-plot. These plots are shown for
+#' individual and population residuals, as well as for npde when they are available} 
+#' \item{random.effects}{Boxplot of the random effects}
+#' \item{correlations}{Correlation between the random effects, with a smoothing spline} 
+#' \item{parameters.versus.covariates}{Plots of the estimate of the individual parameters versus the covariates, using scatterplot for continuous covariates, boxplot for categorical covariates}
+#' \item{randeff.versus.covariates}{Plots of the estimate of the individual random effects versus the covariates, using scatterplot for continuous covariates, boxplot for categorical covariates}
+#' \item{marginal.distribution}{Distribution of each parameter in the model (conditional on covariates when some are included in the model)}
+#' \item{npde}{Plot of npde as in package npde} 
+#' \item{vpc}{Visual Predictive Check} 
+#' }
+#' 
+#' @param saemixObject an object returned by the \code{\link{saemix}} function
+#' @param data if TRUE, produce a plot of the data. Defaults to FALSE
+#' @param convergence if TRUE, produce a convergence plot. Defaults to FALSE
+#' @param likelihood if TRUE, produce a plot of the estimation of the LL by
+#' importance sampling. Defaults to FALSE
+#' @param individual.fit if TRUE, produce individual fits with individual
+#' estimates. Defaults to FALSE
+#' @param population.fit if TRUE, produce individual fits with population
+#' estimates. Defaults to FALSE
+#' @param both.fit if TRUE, produce individual fits with both individual and
+#' population estimates. Defaults to FALSE
+#' @param observations.vs.predictions if TRUE, produce a plot of observations
+#' versus predictions. Defaults to FALSE
+#' @param residuals.scatter if TRUE, produce scatterplots of residuals versus
+#' predictor and predictions. Defaults to FALSE
+#' @param residuals.distribution if TRUE, produce plots of the distribution of
+#' residuals. Defaults to FALSE
+#' @param random.effects if TRUE, produce boxplots of the random effects.
+#' Defaults to FALSE
+#' @param correlations if TRUE, produce a matrix plot showing the correlation
+#' between random effects. Defaults to FALSE
+#' @param parameters.vs.covariates if TRUE, produce plots of the relationships
+#' between parameters and covariates, using the Empirical Bayes Estimates of
+#' individual parameters. Defaults to FALSE
+#' @param randeff.vs.covariates if TRUE, produce plots of the relationships
+#' between random effects and covariates, using the Empirical Bayes Estimates
+#' of individual random effects. Defaults to FALSE
+#' @param marginal.distribution if TRUE, produce plots of the marginal
+#' distribution of the random effects. Defaults to FALSE
+#' @param vpc if TRUE, produce Visual Predictive Check plots. Defaults to FALSE
+#' @param npde if TRUE, produce plots of the npde. Defaults to FALSE
+#' @param \dots optional arguments passed to the plots
+#' @return None
+#' @author Emmanuelle Comets <emmanuelle.comets@@inserm.fr>, Audrey Lavenu,
+#' Marc Lavielle.
+#' @seealso \code{\link{SaemixObject}},\code{\link{saemix}},
+#' \code{\link{default.saemix.plots}}, \code{\link{saemix.plot.setoptions}},
+#' \code{\link{saemix.plot.data}}, \code{\link{saemix.plot.convergence}},
+#' \code{\link{saemix.plot.llis}}, \code{\link{saemix.plot.randeff}},
+#' \code{\link{saemix.plot.obsvspred}}, \code{\link{saemix.plot.fits}},
+#' \code{\link{saemix.plot.parcov}}, \code{\link{saemix.plot.randeffcov}},
+#' \code{\link{saemix.plot.distpsi}},
+#' \code{\link{saemix.plot.scatterresiduals}},
+#' \code{\link{saemix.plot.distribresiduals}}, \code{\link{saemix.plot.vpc}}
+#' @references Kuhn E, Lavielle M. Maximum likelihood estimation in nonlinear
+#' mixed effects models. Computational Statistics and Data Analysis 49, 4
+#' (2005), 1020-1038.
+#' 
+#' Comets E, Lavenu A, Lavielle M. SAEMIX, an R version of the SAEM algorithm.
+#' 20th meeting of the Population Approach Group in Europe, Athens, Greece
+#' (2011), Abstr 2173.
+#' @keywords plot
+#' @examples
+#' 
+#' data(theo.saemix)
+#' 
+#' saemix.data<-saemixData(name.data=theo.saemix,header=TRUE,sep=" ",na=NA, 
+#'   name.group=c("Id"),name.predictors=c("Dose","Time"),
+#'   name.response=c("Concentration"),name.covariates=c("Weight","Sex"),
+#'   units=list(x="hr",y="mg/L",covariates=c("kg","-")), name.X="Time")
+#' 
+#' model1cpt<-function(psi,id,xidep) { 
+#' 	  dose<-xidep[,1]
+#' 	  tim<-xidep[,2]  
+#' 	  ka<-psi[id,1]
+#' 	  V<-psi[id,2]
+#' 	  CL<-psi[id,3]
+#' 	  k<-CL/V
+#' 	  ypred<-dose*ka/(V*(ka-k))*(exp(-k*tim)-exp(-ka*tim))
+#' 	  return(ypred)
+#' }
+#' 
+#' saemix.model<-saemixModel(model=model1cpt,
+#'   description="One-compartment model with first-order absorption", 
+#'   psi0=matrix(c(1.,20,0.5,0.1,0,-0.01),ncol=3, byrow=TRUE,
+#'   dimnames=list(NULL, c("ka","V","CL"))),transform.par=c(1,1,1),
+#'   covariate.model=matrix(c(0,1,0,0,0,0),ncol=3,byrow=TRUE),fixed.estim=c(1,1,1),
+#'   covariance.model=matrix(c(1,0,0,0,1,0,0,0,1),ncol=3,byrow=TRUE),
+#'   omega.init=matrix(c(1,0,0,0,1,0,0,0,1),ncol=3,byrow=TRUE),error.model="constant")
+#' 
+#' saemix.options<-list(seed=632545,save=FALSE,save.graphs=FALSE)
+#' 
+#' # Not run (strict time constraints for CRAN)
+#' # saemix.fit<-saemix(saemix.model,saemix.data,saemix.options)
+#' 
+#' # saemix.plot.select(saemix.fit,data=TRUE,main="Spaghetti plot of data")
+#' 
+#' # Putting several graphs on the same plot
+#' # par(mfrow=c(2,2))
+#' # saemix.plot.select(saemix.fit,data=TRUE,vpc=TRUE,observations.vs.predictions=TRUE, new=FALSE)
+#' 
+#' @export saemix.plot.select
+
 saemix.plot.select<-function(saemixObject,data=FALSE,convergence=FALSE, likelihood=FALSE,individual.fit=FALSE,population.fit=FALSE,both.fit=FALSE, observations.vs.predictions=FALSE,residuals.scatter=FALSE, residuals.distribution=FALSE,random.effects=FALSE,correlations=FALSE, parameters.vs.covariates=FALSE,randeff.vs.covariates=FALSE, marginal.distribution=FALSE,vpc=FALSE,npde=FALSE,...) {
 # Function selecting which plots are to be drawn
   namObj<-deparse(substitute(saemixObject))
@@ -165,7 +393,7 @@ saemix.plot.select<-function(saemixObject,data=FALSE,convergence=FALSE, likeliho
     assign(namObj,saemixObject,envir=parent.frame())
   }
   if(boolpred) {
-    saemixObject<-predict(saemixObject)
+    saemixObject<-saemix.predict(saemixObject)
     assign(namObj,saemixObject,envir=parent.frame())
   }
     if(boolres) {
@@ -198,11 +426,101 @@ saemix.plot.select<-function(saemixObject,data=FALSE,convergence=FALSE, likeliho
 }
 
 #### Meta-niveau
+
+
+#' Wrapper functions to produce certain sets of default plots
+#' 
+#' These functions produce default sets of plots, corresponding to diagnostic
+#' or individual fits.
+#' 
+#' These functions are wrapper functions designed to produce default sets of
+#' plots to help the user assess their model fits.
+#' 
+#' @aliases default.saemix.plots basic.gof advanced.gof covariate.fits individual.fits
+#' @param saemixObject an object returned by the \code{\link{saemix}} function
+#' @param which for covariate fits, whether they should be produced with the
+#' EBE estimates of the parameters (the default) or with random effects
+#' (which="randeff")
+#' @param \dots optional arguments passed to the plots
+#' @return \item{default.saemix.plots}{ by default, the following plots are
+#' produced: a plot of the data, convergence plots, plot of the likelihood by
+#' importance sampling (if computed), plots of observations versus predictions,
+#' scatterplots and distribution of residuals, boxplot of the random effects,
+#' correlations between random effects, distribution of the parameters, VPC}
+#' \item{basic.gof}{ basic goodness-of-fit plots: convergence plots, plot of
+#' the likelihood by importance sampling (if computed), plots of observations
+#' versus predictions} \item{advanced.gof}{ advanced goodness-of-fit plots:
+#' scatterplots and distribution of residuals, VPC,...} \item{covariate.fits}{
+#' plots of all estimated parameters versus all covariates in the dataset}
+#' \item{individual.fits}{ plots of individual predictions (line) overlayed on
+#' individual observations (dots) for all subjects in the dataset}
+#' @author Emmanuelle Comets <emmanuelle.comets@@inserm.fr>, Audrey Lavenu,
+#' Marc Lavielle.
+#' @seealso \code{\link{saemix}}, \code{\link{saemix.plot.data}},
+#' \code{\link{saemix.plot.setoptions}}, \code{\link{plot.saemix}}
+#' @references Kuhn E, Lavielle M. Maximum likelihood estimation in nonlinear
+#' mixed effects models. Computational Statistics and Data Analysis 49, 4
+#' (2005), 1020-1038.
+#' 
+#' Comets E, Lavenu A, Lavielle M. SAEMIX, an R version of the SAEM algorithm.
+#' 20th meeting of the Population Approach Group in Europe, Athens, Greece
+#' (2011), Abstr 2173.
+#' @keywords plots
+#' @examples
+#' 
+#' data(theo.saemix)
+#' 
+#' saemix.data<-saemixData(name.data=theo.saemix,header=TRUE,sep=" ",na=NA, 
+#'   name.group=c("Id"),name.predictors=c("Dose","Time"),
+#'   name.response=c("Concentration"),name.covariates=c("Weight","Sex"),
+#'   units=list(x="hr",y="mg/L",covariates=c("kg","-")), name.X="Time")
+#' 
+#' model1cpt<-function(psi,id,xidep) { 
+#' 	  dose<-xidep[,1]
+#' 	  tim<-xidep[,2]  
+#' 	  ka<-psi[id,1]
+#' 	  V<-psi[id,2]
+#' 	  CL<-psi[id,3]
+#' 	  k<-CL/V
+#' 	  ypred<-dose*ka/(V*(ka-k))*(exp(-k*tim)-exp(-ka*tim))
+#' 	  return(ypred)
+#' }
+#' 
+#' saemix.model<-saemixModel(model=model1cpt,
+#'   description="One-compartment model with first-order absorption", 
+#'   psi0=matrix(c(1.,20,0.5,0.1,0,-0.01),ncol=3, byrow=TRUE,
+#'   dimnames=list(NULL, c("ka","V","CL"))),transform.par=c(1,1,1),
+#'   covariate.model=matrix(c(0,1,0,0,0,0),ncol=3,byrow=TRUE),fixed.estim=c(1,1,1),
+#'   covariance.model=matrix(c(1,0,0,0,1,0,0,0,1),ncol=3,byrow=TRUE),
+#'   omega.init=matrix(c(1,0,0,0,1,0,0,0,1),ncol=3,byrow=TRUE),error.model="constant")
+#' 
+#' # Reducing the number of iterations due to time constraints for CRAN
+#' saemix.options<-list(seed=632545,save=FALSE,save.graphs=FALSE,nbiter.saemix=c(100,100))
+#' 
+#' saemix.fit<-saemix(saemix.model,saemix.data,saemix.options)
+#' 
+#' default.saemix.plots(saemix.fit)
+#' 
+#' # Not run (time constraints for CRAN)
+#' # basic.gof(saemix.fit)
+#' 
+#' # Not run (time constraints for CRAN)
+#' # advanced.gof(saemix.fit)
+#' 
+#' individual.fits(saemix.fit)
+#' 
+#' 
+#' @export default.saemix.plots
+#' @export basic.gof
+#' @export advanced.gof
+#' @export individual.fits
+#' @export covariate.fits
+
 default.saemix.plots<-function(saemixObject,...) {
 # When plot(saemixObject) is called without plot.type  
   namObj<-deparse(substitute(saemixObject))
   if(length(saemixObject["results"]["ipred"])==0) {
-    saemixObject<-predict(saemixObject)
+    saemixObject<-saemix.predict(saemixObject)
     assign(namObj,saemixObject,envir=parent.frame())
   }
   if(length(saemixObject["results"]["npde"])==0) {
@@ -217,7 +535,7 @@ basic.gof<-function(saemixObject,...) {
   cat("Now producing basic goodness of fit plots\n")
   namObj<-deparse(substitute(saemixObject))
   if(length(saemixObject["results"]["ipred"])==0) {
-    saemixObject<-predict(saemixObject)
+    saemixObject<-saemix.predict(saemixObject)
     assign(namObj,saemixObject,envir=parent.frame())
   }
   saemix.plot.select(saemixObject,convergence=TRUE,likelihood=TRUE, observations.vs.predictions=TRUE, ...)
@@ -228,7 +546,7 @@ advanced.gof<-function(saemixObject,...) {
   cat("Now producing advanced goodness of fit plots\n")
   namObj<-deparse(substitute(saemixObject))
   if(length(saemixObject["results"]["ipred"])==0) {
-    saemixObject<-predict(saemixObject)
+    saemixObject<-saemix.predict(saemixObject)
     assign(namObj,saemixObject,envir=parent.frame())
   }
   if(length(saemixObject["results"]["npde"])==0) {
@@ -243,7 +561,7 @@ individual.fits<-function(saemixObject,...) {
   cat("Now producing plots of individual fits\n")
   namObj<-deparse(substitute(saemixObject))
   if(length(saemixObject["results"]["ipred"])==0) {
-    saemixObject<-predict(saemixObject)
+    saemixObject<-saemix.predict(saemixObject)
     assign(namObj,saemixObject,envir=parent.frame())
   }
   plot(saemixObject,plot.type="individual.fit",...)
@@ -263,6 +581,173 @@ covariate.fits<-function(saemixObject,which="parameters",...) {
 ###############################	   	Data	 #################################
 
 # ECO FINISH THIS ONE (redo without using data part of object)
+
+#' Functions implementing each type of plot in SAEM
+#' 
+#' Several plots (selectable by the type argument) are currently available:
+#' convergence plot, individual plots, predictions versus observations,
+#' distribution plots, VPC, residual plots.
+#' 
+#' These functions implement plots different graphs related to the algorithm
+#' (convergence plots, likelihood estimation) as well as diagnostic graphs. A
+#' description is provided in the PDF documentation.
+#' 
+#' saemix.plot.parcov.aux, compute.sres and compute.eta.map are helper
+#' functions, not intended to be called by the user directly.
+#' 
+#' By default, the following plots are produced: \describe{
+#' \item{saemix.plot.data:}{A spaghetti plot of the data, displaying the
+#' observed data y as a function of the regression variable (time for a PK
+#' application)} \item{saemix.plot.convergence:}{For each parameter in the
+#' model, this plot shows the evolution of the parameter estimate versus the
+#' iteration number} \item{saemix.plot.llis:}{Graph showing the evolution of
+#' the log-likelihood during the estimation by importance sampling}
+#' \item{saemix.plot.obsvspred:}{Plot of the predictions computed with the
+#' population parameters versus the observations (left), and plot of the
+#' predictions computed with the individual parameters versus the observations
+#' (right)} \item{saemix.plot.scatterresiduals:}{Scatterplot of the residuals
+#' versus the predictor (top) and versus predictions (bottom), for weighted
+#' residuals (population residuals, left), individual weighted residuals
+#' (middle) and npde (right).}
+#' \item{saemix.plot.distribresiduals:}{Distribution of the residuals, plotted
+#' as histogram (top) and as a QQ-plot (bottom), for weighted residuals
+#' (population residuals, left), individual weighted residuals (middle) and
+#' npde (right).} \item{saemix.plot.fits:}{Model fits. Individual fits are
+#' obtained using the individual parameters with the individual covariates.
+#' Population fits are obtained using the population parameters with the
+#' individual covariates (red) and the individual parameters with the
+#' individual covariates (green). By default the individual plots are
+#' displayed.} \item{saemix.plot.distpsi:}{Distribution of the parameters
+#' (conditional on covariates when some are included in the model). A histogram
+#' of individual parameter estimates can be overlayed on the plot, but it
+#' should be noted that the histogram does not make sense when there are
+#' covariates influencing the parameters and a warning will be displayed}
+#' \item{saemix.plot.randeff:}{Boxplot of the random effects}
+#' \item{saemix.plot.correlations:}{Correlation between the random effects}
+#' \item{saemix.plot.parcov:}{Plots of the estimates of the individual
+#' parameters versus the covariates, using scatterplot for continuous
+#' covariates, boxplot for categorical covariates}
+#' \item{saemix.plot.randeffcov:}{Plots of the estimates of the random effects
+#' versus the covariates, using scatterplot for continuous covariates, boxplot
+#' for categorical covariates} \item{saemix.plot.npde:}{Plots 4 graphs to
+#' evaluate the shape of the distribution of the normalised prediction
+#' distribution errors (npde)} \item{saemix.plot.vpc:}{Visual Predictive Check,
+#' with options to include the prediction intervals around the boundaries of
+#' the selected interval as well as around the median (50th percentile of the
+#' simulated data). Several methods are available to define binning on the
+#' X-axis (see methods in the PDF guide).} }
+#' 
+#' Each plot can be customised by modifying options, either through a list of
+#' options set by the \code{\link{saemix.plot.setoptions}} function, or on the
+#' fly by passing an option in the call to the plot (see examples).
+#' 
+#' @aliases saemix.plot.data saemix.plot.convergence saemix.plot.llis
+#' saemix.plot.obsvspred saemix.plot.distribresiduals
+#' saemix.plot.scatterresiduals saemix.plot.fits saemix.plot.distpsi
+#' saemix.plot.randeff saemix.plot.correlations saemix.plot.parcov
+#' saemix.plot.randeffcov saemix.plot.npde saemix.plot.vpc
+#' saemix.plot.parcov.aux compute.sres compute.eta.map
+#' @param saemixObject an object returned by the \code{\link{saemix}} function
+#' @param \dots optional arguments passed to the plots
+#' @param npc for VPC, computes Numerical Predictive Checks (currently not
+#' implemented)
+#' @param niter the convergence plots are shown up to iteration "niter".
+#' Defaults to 0, which indicates the convergence plots should be plotted up to
+#' the maximal number of iterations set for the algorithm
+#' @param partype (this function is not user-level)
+#' @return None
+#' @author Emmanuelle Comets <emmanuelle.comets@@inserm.fr>, Audrey Lavenu,
+#' Marc Lavielle.
+#' @seealso \code{\link{SaemixObject}},\code{\link{saemix}},
+#' \code{\link{saemix.plot.setoptions}}, \code{\link{saemix.plot.select}},
+#' \code{\link{plot.saemix}}
+#' @references Kuhn E, Lavielle M. Maximum likelihood estimation in nonlinear
+#' mixed effects models. Computational Statistics and Data Analysis 49, 4
+#' (2005), 1020-1038.
+#' 
+#' Comets E, Lavenu A, Lavielle M. SAEMIX, an R version of the SAEM algorithm.
+#' 20th meeting of the Population Approach Group in Europe, Athens, Greece
+#' (2011), Abstr 2173.
+#' @keywords plot
+#' @examples
+#' 
+#' data(theo.saemix)
+#' 
+#' saemix.data<-saemixData(name.data=theo.saemix,header=TRUE,sep=" ",na=NA, 
+#'   name.group=c("Id"),name.predictors=c("Dose","Time"),
+#'   name.response=c("Concentration"),name.covariates=c("Weight","Sex"),
+#'   units=list(x="hr",y="mg/L",covariates=c("kg","-")), name.X="Time")
+#' 
+#' model1cpt<-function(psi,id,xidep) { 
+#' 	  dose<-xidep[,1]
+#' 	  tim<-xidep[,2]  
+#' 	  ka<-psi[id,1]
+#' 	  V<-psi[id,2]
+#' 	  CL<-psi[id,3]
+#' 	  k<-CL/V
+#' 	  ypred<-dose*ka/(V*(ka-k))*(exp(-k*tim)-exp(-ka*tim))
+#' 	  return(ypred)
+#' }
+#' 
+#' saemix.model<-saemixModel(model=model1cpt,
+#'   description="One-compartment model with first-order absorption", 
+#'   psi0=matrix(c(1.,20,0.5,0.1,0,-0.01),ncol=3, byrow=TRUE,
+#'   dimnames=list(NULL, c("ka","V","CL"))),transform.par=c(1,1,1),
+#'   covariate.model=matrix(c(0,1,0,0,0,0),ncol=3,byrow=TRUE),fixed.estim=c(1,1,1),
+#'   covariance.model=matrix(c(1,0,0,0,1,0,0,0,1),ncol=3,byrow=TRUE),
+#'   omega.init=matrix(c(1,0,0,0,1,0,0,0,1),ncol=3,byrow=TRUE),error.model="constant")
+#' 
+#' saemix.options<-list(seed=632545,save=FALSE,save.graphs=FALSE)
+#' 
+#' # Not run (strict time constraints for CRAN)
+#' # saemix.fit<-saemix(saemix.model,saemix.data,saemix.options)
+#' 
+#' # Simulate data and compute weighted residuals and npde
+#' # saemix.fit<-compute.sres(saemix.fit)
+#' 
+#' # Data
+#' # saemix.plot.data(saemix.fit)
+#' 
+#' # Convergence
+#' # saemix.plot.convergence(saemix.fit)
+#' 
+#' # Individual plot for subject 1, smoothed
+#' # saemix.plot.fits(saemix.fit,ilist=1,smooth=TRUE)
+#' 
+#' # Individual plot for subject 1 to 12, with ask set to TRUE 
+#' # (the system will pause before a new graph is produced)
+#' # saemix.plot.fits(saemix.fit,ilist=c(1:12),ask=TRUE)
+#' 
+#' # Diagnostic plot: observations versus population predictions
+#' # par(mfrow=c(1,1))
+#' # saemix.plot.obsvspred(saemix.fit,level=0,new=FALSE)
+#' 
+#' # LL by Importance Sampling
+#' # saemix.plot.llis(saemix.fit)
+#' 
+#' # Scatter plot of residuals
+#' # saemix.plot.scatterresiduals(saemix.fit)
+#' 
+#' # Boxplot of random effects
+#' # saemix.plot.randeff(saemix.fit)
+#' 
+#' # Relationships between parameters and covariates
+#' # saemix.plot.parcov(saemix.fit)
+#' 
+#' # Relationships between parameters and covariates, on the same page
+#' # par(mfrow=c(3,2))
+#' # saemix.plot.parcov(saemix.fit,new=FALSE)
+#' 
+#' # VPC, default options (10 bins, equal number of observations in each bin)
+#' # Not run (time constraints for CRAN)
+#' # saemix.plot.vpc(saemix.fit)
+#' 
+#' # VPC, user-defined breaks for binning
+#' # Not run (time constraints for CRAN)
+#' # saemix.plot.vpc(saemix.fit,vpc.method="user", vpc.breaks=c(0.4,0.8,1.5,2.5,4,5.5,8,10,13))
+#' 
+#' @export saemix.plot.data
+
 saemix.plot.data<-function(saemixObject,...) {
 # Plot of the data as spaghetti plot
 # options: change data point, line type, line color, lines plotted or not, points plotted or not...

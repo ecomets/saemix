@@ -4,6 +4,38 @@
 
 ###############################
 # Definition with initialise
+
+#' Class "SaemixRes"
+#' 
+#' An object of the SaemixRes class, representing the results of a fit through the SAEM algorithm.
+#' 
+#' @name SaemixRes-class 
+#' @docType class
+#' @aliases SaemixRes SaemixRes-class
+#' initialize,SaemixRes-method [<-,SaemixRes-method [,SaemixRes-method
+#' print,SaemixRes-method showall,SaemixRes-method show,SaemixRes-method
+#' plot,SaemixRes print,SaemixRes showall,SaemixRes show,SaemixRes 
+#' 
+#' @section Objects from the Class: 
+#' An object of the SaemixRes class is returned as part of a SaemixObject object after a call to \code{\link{saemix)()}} and contain the following slots:
+#'   \describe{
+#'     \item{\code{name.fixed}:}{a vector containing the names of the fixed parameters in the model}
+#'     }
+#' @references Kuhn E, Lavielle M. Maximum likelihood estimation in nonlinear mixed effects models. Computational Statistics and Data Analysis 49, 4 (2005), 1020-1038.
+#' 
+#' Comets E, Lavenu A, Lavielle M. SAEMIX, an R version of the SAEM algorithm. 20th meeting of the Population Approach Group in Europe, Athens, Greece (2011), Abstr 2173.
+#' @author Emmanuelle Comets \email{emmanuelle.comets@@inserm.fr}
+#' @author Audrey Lavenu
+#' @author Marc Lavielle.
+#' @seealso \code{\link{saemixData}} \code{\link{SaemixModel}} \code{\link{saemixControl}} \code{\link{saemix}}
+#' @examples
+#' methods(class="SaemixRes")
+#' 
+#' showClass("SaemixRes")
+#' 
+#' @keywords classes
+#' @exportClass SaemixRes
+
 setClass(
   Class="SaemixRes",
   representation=representation(
@@ -29,15 +61,15 @@ setClass(
     indx.res="numeric",	# index of param of residual errors estimated (was indx.res)
     MCOV="matrix",		# 
 # Individual parameters
-    cond.mean.phi="matrix",	# Cond mean estimates of Phi
-    cond.mean.psi="matrix",	# Cond mean estimates of Psi
-    cond.var.phi="matrix",
-    cond.mean.eta="matrix",	# Cond mean estimates of Eta
+    cond.mean.phi="matrix",	# Cond mean estimates of Phi (mean of conditional distribution)
+    cond.mean.psi="matrix",	# Cond mean estimates of Psi (h(cond.mean.phi))
+    cond.var.phi="matrix",  # Variability on cond.mean.phi (var of conditional distribution)
+    cond.mean.eta="matrix",	# Cond mean estimates of eta (CHECK FORMULA)
     cond.shrinkage="numeric",	# Shrinkage for cond mean estimates of Eta
-    mean.phi="matrix",
-    map.psi="data.frame",	# MAP estimates of individual parameters
+    mean.phi="matrix",  # population estimate (Ci*mu) including covariate effects
+    map.psi="data.frame",	# MAP estimates of individual parameters 
     map.phi="data.frame",	# MAP estimates of phi
-    map.eta="matrix",		# ETAs corresponding to the MAP estimates
+    map.eta="matrix",		# ETAs corresponding to the MAP estimates (computed as map.phi-COV%*%MCOV in compute.eta.map)
     map.shrinkage="numeric", 	# shrinkage on MAP estimates
     phi="matrix",
     psi.samp="array",		# nb.chains samples in the individual conditional distributions (psi)
@@ -60,6 +92,7 @@ setClass(
     ppred="numeric",		# vector of population predictions with MAP
     ipred="numeric",		# vector of individual predictions with MAP
     icpred="numeric",		# vector of individual predictions with conditional estimates
+    ires="numeric",		  # vector of individual residuals with MAP (ipred-x)
     iwres="numeric",		# vector of individual weighted residuals with MAP
     icwres="numeric",		# vector of individual weighted residuals with conditional estimates
     wres="numeric",		# vector of WRES (population weighted residuals)
@@ -127,6 +160,14 @@ setMethod(
 ####			SaemixRes class - accesseur				####
 ####################################################################################
 
+##' Get/set methods for SaemixRes object
+##' 
+##' Access slots of a SaemixRes using the object["slot"] format
+##' 
+##' @keywords methods
+##' @exportMethod [
+##' @exportMethod [<-
+
 # Getteur
 setMethod(
   f ="[",
@@ -183,6 +224,7 @@ setMethod(
     "ppred"={return(x@ppred)},
     "ipred"={return(x@ipred)},
     "icpred"={return(x@icpred)},
+    "ires"={return(x@ires)},
     "iwres"={return(x@iwres)},
     "icwres"={return(x@icwres)},
     "wres"={return(x@wres)},
@@ -250,6 +292,7 @@ setReplaceMethod(
     "ppred"={x@ppred<-value},
     "ipred"={x@ipred<-value},
     "icpred"={x@icpred<-value},
+    "ires"={x@ires<-value},
     "iwres"={x@iwres<-value},
     "icwres"={x@icwres<-value},
     "wres"={x@wres<-value},
@@ -513,6 +556,99 @@ setMethod("showall","SaemixRes",
     cat("----------------------------------------------------\n")
   }
 )
+
+####################################################################################
+####			SaemixRes class - extracting residuals	and fitted values		####
+####################################################################################
+# resid.lm
+#           function (object, type = c("working", "response", "deviance", 
+#                                      "pearson", "partial"), ...) 
+#           {
+#             type <- match.arg(type)
+#             r <- object$residuals
+#             res <- switch(type, working = , response = r, deviance = , 
+#                           pearson = if (is.null(object$weights)) r else r * sqrt(object$weights), 
+#                           partial = r)
+#             res <- naresid(object$na.action, res)
+#             if (type == "partial") 
+#               res <- res + predict(object, type = "terms")
+#             res
+#           }
+
+#' Extract Model Residuals
+#' 
+#' residuals is a generic function which extracts model residuals from objects returned by modeling functions. The  abbreviated form resid is an alias for residuals
+#' 
+#' @name residuals.saemix
+#' @aliases resid.saemix residuals resid resid,SaemixObject residuals,SaemixObject  resid,SaemixRes residuals,SaemixRes
+#' 
+#' @param object a SaemixRes or a SaemixObject 
+#' @param ... additional arguments. If a type argument is present, its value will be used to determine which residuals are extracted. Possible values are: "ires" (individual residuals), "wres" (weighted population residuals), "npde" (normalised prediction distribution errors), "pd" (prediction discrepancies), "iwres" (individual weighted residuals) and "icwres" (conditional individual weighted residuals). See user guide for details.
+#' 
+#' @return By default, individual residuals are extracted from the model object
+#' 
+#' @keywords methods
+#' @exportMethod resid
+
+setMethod("resid","SaemixRes",
+          function (object, type = c("ires", "wres", "npde", "pd", "iwres", "icwres"), ...) 
+          {
+            type <- match.arg(type)
+            res <- switch(type, ires=object@ires, wres=object@wres, npde=object@npde, iwres=object@iwres, icwres=object@icwres, pd=object@pd)
+            res
+          }
+)
+
+setMethod("fitted","SaemixRes",
+          function (object, type = c("ipred", "ypred", "ppred", "icpred"), ...) 
+          {
+            type <- match.arg(type)
+            pred <- switch(type, ipred=object@ipred, ypred=object@ypred, ppred=object@ppred, ipred=object@ipred, icpred=object@icpred)
+            pred
+          }
+)
+
+####################################################################################
+####			SaemixRes class - variance-covariance matrix		####
+####################################################################################
+
+#' Extracts the Variance-Covariance Matrix for a Fitted Model Object
+#' 
+#' Returns the variance-covariance matrix of the main parameters of a fitted model object
+#' 
+#' @name vcov
+#' @aliases vcov vcov.SaemixRes vcov.SaemixObject ##vcov,SaemixRes vcov,SaemixObject
+#' 
+#' @param object a fitted object from a call to saemix
+#' @param ...	additional arguments for method functions (unused)
+#' 
+#' @return A matrix of the estimated covariances between the parameter estimates in model. In saemix, this matrix is obtained as the inverse of the Fisher Information Matrix computed by linearisation
+#' 
+#' @export vcov.SaemixRes
+#' @export vcov.SaemixObject
+
+vcov.SaemixRes<-function(object, ...) {
+  object@fim
+}
+
+vcov.SaemixObject<-function(object, ...) {
+  vcov(object@results)
+}
+
+# setMethod("vcov","SaemixRes",
+#           function (object, ...) 
+#           {
+#             object@fim
+#           }
+# )
+# 
+# setMethod("vcov","SaemixObject",
+#           function (object, ...) 
+#           {
+#             vcov(object@results)
+#           }
+# )
+
 
 ####################################################################################
 ####			SaemixRes class - method to plot			####

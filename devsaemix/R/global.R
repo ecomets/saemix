@@ -2,8 +2,8 @@
 ####				Generic functions				####
 ####################################################################################
 
-setGeneric(name="read.saemixData",
-  def=function(object){standardGeneric("read.saemixData")}
+setGeneric(name="read",
+  def=function(object){standardGeneric("read")}
 )
 
 setGeneric(name="showall",
@@ -23,13 +23,5 @@ setGeneric(name="eta",
 )
 
 # setGeneric(name="predict",def=function(object){standardGeneric("predict")})
-
-####################################################################################
-####				Library functions				####
-####################################################################################
-
-#source("func_main.R")
-#source("func_aux.R")
-#source("func_plots.R")
 
 ####################################################################################

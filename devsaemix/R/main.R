@@ -1,3 +1,79 @@
+#' Stochastic Approximation Expectation Maximization (SAEM) algorithm
+#' 
+#' SAEM algorithm perform parameter estimation for nonlinear mixed effects
+#' models without any approximation of the model (linearization, quadrature
+#' approximation, . . . )
+#' 
+#' The SAEM algorithm is a stochastic approximation version of the standard EM
+#' algorithm proposed by Kuhn and Lavielle (see reference). Details of the
+#' algorithm can be found in the pdf file accompanying the package.
+#' 
+#' @param model an object of class SaemixModel, created by a call to the
+#' function \code{\link{saemixModel}}
+#' @param data an object of class SaemixData, created by a call to the function
+#' \code{\link{saemixData}}
+#' @param control a list of options, see \code{\link{saemixControl}}
+#' @return An object of class SaemixObject containing the results of the fit of
+#' the data by the non-linear mixed effect model. A summary of the results is
+#' printed out to the terminal, and, provided the appropriate options have not
+#' been changed, numerical and graphical outputs are saved in a directory.
+#' @author Emmanuelle Comets <emmanuelle.comets@@inserm.fr>, Audrey Lavenu,
+#' Marc Lavielle.
+#' @seealso \code{\link{SaemixData}},\code{\link{SaemixModel}},
+#' \code{\link{SaemixObject}}, \code{\link{saemixControl}},
+#' \code{\link{plot.saemix}}
+#' @references Kuhn E, Lavielle M. Maximum likelihood estimation in nonlinear
+#' mixed effects models. Computational Statistics and Data Analysis 49, 4
+#' (2005), 1020-1038.
+#' 
+#' Comets E, Lavenu A, Lavielle M. SAEMIX, an R version of the SAEM algorithm.
+#' 20th meeting of the Population Approach Group in Europe, Athens, Greece
+#' (2011), Abstr 2173.
+#' @keywords models
+#' @examples
+#' 
+#' data(theo.saemix)
+#' 
+#' saemix.data<-saemixData(name.data=theo.saemix,header=TRUE,sep=" ",na=NA,
+#'    name.group=c("Id"),name.predictors=c("Dose","Time"),
+#'    name.response=c("Concentration"),name.covariates=c("Weight","Sex"),
+#'    units=list(x="hr",y="mg/L", covariates=c("kg","-")), name.X="Time")
+#' 
+#' model1cpt<-function(psi,id,xidep) { 
+#' 	  dose<-xidep[,1]
+#' 	  tim<-xidep[,2]  
+#' 	  ka<-psi[id,1]
+#' 	  V<-psi[id,2]
+#' 	  CL<-psi[id,3]
+#' 	  k<-CL/V
+#' 	  ypred<-dose*ka/(V*(ka-k))*(exp(-k*tim)-exp(-ka*tim))
+#' 	  return(ypred)
+#' }
+#' 
+#' saemix.model<-saemixModel(model=model1cpt,
+#'   description="One-compartment model with first-order absorption", 
+#'   psi0=matrix(c(1.,20,0.5,0.1,0,-0.01),ncol=3, byrow=TRUE,
+#'   dimnames=list(NULL, c("ka","V","CL"))),transform.par=c(1,1,1),
+#'   covariate.model=matrix(c(0,1,0,0,0,0),ncol=3,byrow=TRUE),fixed.estim=c(1,1,1),
+#'   covariance.model=matrix(c(1,0,0,0,1,0,0,0,1),ncol=3,byrow=TRUE),
+#'   omega.init=matrix(c(1,0,0,0,1,0,0,0,1),ncol=3,byrow=TRUE),error.model="constant")
+#' 
+#' 
+#' # Not run (strict time constraints for CRAN)
+#' # saemix.fit<-saemix(saemix.model,saemix.data,list(seed=632545,directory="newtheo",
+#' # save=FALSE,save.graphs=FALSE))
+#' 
+#' # Prints a summary of the results
+#' # print(saemix.fit)
+#' 
+#' # Outputs the estimates of individual parameters
+#' # psi(saemix.fit)
+#' 
+#' # Shows some diagnostic plots to evaluate the fit
+#' # plot(saemix.fit)
+#' 
+#' 
+#' @export saemix
 saemix<-function(model,data,control=list()) {
 
 # Convergence plots during fit (special function, not user-level)
@@ -252,7 +328,7 @@ cond.mean.eta<-t(apply(cond.mean.eta,c(1,2),mean))
 
 # ECO TODO finish, adding all
   if(saemix.options$save.graphs) {
-    saemixObject<-predict(saemixObject)
+    saemixObject<-saemix.predict(saemixObject)
     if(saemix.options$directory=="") namgr<-"diagnostic_graphs.ps" else
       namgr<-file.path(saemix.options$directory,"diagnostic_graphs.ps")
     xtry<-try(postscript(namgr,horizontal=TRUE))

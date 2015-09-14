@@ -1,65 +1,81 @@
 ####################################################################################
 ####			SaemixData class - definition				####
 ####################################################################################
-
 # ECO TODO: check on name validity
 
 ###############################
 # Definition with initialise
 
-##' Class "SaemixData" representing the structure of the longitudinal data
-##' 
-##' A longitudinal data structure
-##' 
-##' @name SaemixData-class
-##' @aliases SaemixData SaemixData-class show,SaemixData-method showall,SaemixData-method
-##'  print,SaemixData-method summary,SaemixData-method [,SaemixData-method [<-,SaemixData-method
-##' @docType class
-##' @section Objects from the Class: SaemixData objects are typically created by calls to \code{\link{saemixData}} and contain the following slots:
-##' 
-##' \describe{
-##' \item{name.data}{character string giving the name of the dataset}
-##' \item{header}{boolean indicating whether the file has a header (used when name.data is a file)}
-##' \item{na}{symbol(s) used to indicate which values are missing (used when name.data is a file)}
-##' \item{name.group}{character string giving the name of the grouping term (ID)}
-##' \item{name.predictors}{character string giving the name of the predictor(s) (X), typically time, dose,...}
-##' \item{name.response}{character string giving the name of the response (Y)}
-##' \item{name.covariates}{vector of character string giving the name(s) of the covariates}
-##' \item{name.X}{character string giving the name(s) of the predictor to plot on the X-axis (for graphs)}
-##' \item{name.mdv}{character string giving the name of the missing data indicator}
-##' \item{name.cens}{character string giving the name of the censoring indicator}
-##' \item{name.occ}{character string giving the name of the column with the occasino}
-##' \item{name.ytype}{character string giving the indicator for response (used for multiple response models)}
-##' \item{trans.cov}{a list containing the transformation, if any, applied to the covariates before the analysis is run. For each transformed covariate, a list with the name of the covariate is written (only one transformation per covariate), containing the type (cont/cat) of the covariate and different elements depending on type. For type="cont", the additional arguments are transformation (a function) and centering (a value used to center the covariate before the transformation is applied). For type="cat", the additional arguments are group () and reference (the refernce category). More details are provided in the documentation for \code{\link{transform.cov}} and \code{\link{transform.cat}} functions.}
-##' \item{units}{(optional) a list with the units for X, Y, and covariates}
-##' \item{data}{a dataframe containing the data. The covariate columns correspond to the covariates used in the analysis: binary covariates are recoded to 0/1 values, and dummy covariates are created for each category of categorical covariates except the reference}
-##' \item{ocov}{a dataframe containing the covariates read in the dataset (before transformation and recoding)}
-##' \item{yorig}{vector of responses in original dataset (used when the error model in the analysis is an exponential model, the y values in the dataset are then log-transformed and the original values stored in yorig)}
-##' \item{N}{number of subjects}
-##' \item{ntot.obs}{total number of non-missing observations}
-##' \item{nind.obs}{vector of size N giving the number of non-missing observations for each subject}
-##' \item{ind.gen}{vector of booleans of size name.covariates; TRUE indicates a genetic covariate and FALSE indicating a non-genetic covariate}
-##' }
-##' @section Methods:
-##' \describe{
-##'   \item{saemixData(name.data):}{Create a new \code{\linkS4class{SaemixData}} object from dataset name.data}
-##'   \item{print(saemix.data):}{Prints a summary of object saemix.data}
-##'   \item{show(saemix.data):}{Prints a short summary of object saemix.data}
-##'   \item{showall(saemix.data):}{Prints a detailed summary of object saemix.data}
-##'   \item{plot(saemix.data):}{Plots the data in saemix.data. More details can be found in \code{\link{plot.SaemixData}}}
-##'   \item{summary(saemix.data):}{Returns a summary of object saemix.data in list format}
-##'   \item{set.plotoptions(saemix.data):}{Sets options for graphs of saemix.data (internal method used in plots)}
-##' }
-##' @seealso \code{\link{saemix}}, \code{\link{autosaemix}}, \code{\link{plot.SaemixData}}
-##' @keywords classes
-##' @examples
-##' 
-##' methods(class="SaemixData")
-##' 
-##' showClass("SaemixData")
-##' 
-##' @exportClass SaemixData
-
+#' Class "SaemixData"
+#' 
+#' An object of the SaemixData class, representing a longitudinal data structure, used by the SAEM algorithm.
+#' 
+#' @name SaemixData-class 
+#' @docType class
+#' @aliases SaemixData SaemixData-class
+#' initialize,SaemixData-method [<-,SaemixData-method [,SaemixData-method
+#' plot,SaemixData-method print,SaemixData-method showall,SaemixData-method show,SaemixData-method
+#' plot,SaemixData print,SaemixData showall,SaemixData show,SaemixData 
+#' read read,SaemixData-method
+#' SaemixRepData-class SaemixRepData initialize,SaemixRepData-method show,SaemixRepData-method
+#' SaemixSimData-class SaemixSimData initialize,SaemixSimData-method plot,SaemixSimData-method show,SaemixSimData-method
+#' [<-,SaemixSimData-method [,SaemixSimData-method
+#' [<-,SaemixRepData-method [,SaemixRepData-method
+#' 
+#' @section Objects from the Class: 
+#' An object of the SaemixData class can be created by using the function \code{\link{saemixData}} and contain the following slots:
+#'   \describe{
+#'     \item{\code{name.data}:}{Object of class \code{"character"}: name of the dataset}
+#'     \item{\code{header}:}{Object of class \code{"logical"}: whether the dataset/file contains a header. Defaults to TRUE }
+#'     \item{\code{sep}:}{Object of class \code{"character"}: the field separator character}
+#'     \item{\code{na}:}{Object of class \code{"character"}: a character vector of the strings which are to be interpreted as NA values}
+#'     \item{\code{name.group}:}{Object of class \code{"character"}: name of the column containing the subject id}
+#'     \item{\code{name.predictors}:}{Object of class \code{"character"}: name of the column(s) containing the predictors}
+#'     \item{\code{name.response}:}{Object of class \code{"character"}: name of the column containing the response variable y modelled by predictor(s) x}
+#'     \item{\code{name.covariates}:}{Object of class \code{"character"}: name of the column(s) containing the covariates, if present (otherwise empty)}
+#'     \item{\code{name.genetic.covariates}:}{Object of class \code{"character"}: name of the column(s) containing the covariates, if present (otherwise empty)}
+#'     \item{\code{name.X}:}{Object of class \code{"character"}: name of the column containing the regression variable to be used on the X axis in the plots}
+#'     \item{\code{name.mdv}:}{Object of class \code{"character"}: name of the column containing the indicator variable denoting missing data}
+#'     \item{\code{name.cens}:}{Object of class \code{"character"}: name of the column containing the indicator variable denoting censored data (the value in the name.response column will be taken as the censoring value)}
+#'     \item{\code{name.occ}:}{Object of class \code{"character"}: name of the column containing the value of the occasion}
+#'     \item{\code{name.ytype}:}{Object of class \code{"character"}: name of the column containing the response number}
+#'     \item{\code{trans.cov}:}{Object of class \code{"list"}: the list of transformation applied to the covariates (currently unused, TODO)}
+#'     \item{\code{units}:}{Object of class \code{"list"}: list with up to three elements, x, y and optionally covariates, containing the units for the X and Y variables respectively, as well as the units for the different covariates}
+#'     \item{\code{data}:}{Object of class \code{"data.frame"}: dataframe containing the data, with columns for id (name.group), predictors (name.predictors), response (name.response), and covariates if present in the dataset (name.covariates). A column "index" contains the subject index (used to map the subject id). The column names, except for the additional column index, correspond to the names in the original dataset.}
+#'     \item{\code{N}:}{Object of class \code{"numeric"}: number of subjects}
+#'     \item{\code{yorig}:}{Object of class \code{"numeric"}: response data, on the original scale. Used when the error model is exponential}
+#'     \item{\code{ntot.obs}:}{Object of class \code{"numeric"}: total number of observations}
+#'     \item{\code{nind.obs}:}{Object of class \code{"numeric"}: vector containing the number of observations for each subject}
+#'   }
+#' @section Methods:
+#'   \describe{
+#'     \item{[<-}{\code{signature(x = "SaemixData")}: replace elements of object}
+#'     \item{[}{\code{signature(x = "SaemixData")}: access elements of object}
+#'     \item{initialize}{\code{signature(.Object = "SaemixData")}: internal function to initialise object, not to be used}
+#'     \item{plot}{\code{signature(x = "SaemixData")}: plot the data}
+#'     \item{print}{\code{signature(x = "SaemixData")}: prints details about the object (more extensive than show)}
+#'     \item{read}{\code{signature(object = "SaemixData")}: internal function, not to be used }
+#'     \item{showall}{\code{signature(object = "SaemixData")}: shows all the elements in the object}
+#'     \item{show}{\code{signature(object = "SaemixData")}: prints details about the object}
+#'     \item{summary}{\code{signature(object = "SaemixData")}: summary of the data. Returns a list with a number of elements extracted from the dataset (N: the number of subjects; nobs: the total number of observations; nind.obs: a vector giving the number of observations for each subject; id: subject ID; x: predictors; y: response, and, if present in the data, covariates: the covariates (as many lines as observations) and ind.covariates: the individual covariates (one line per individual).}
+#'     \item{subset}{\code{signature(object = "SaemixData")}: extract part of the data; this function will operate on the rows of the dataset (it can be used for instance to extract the data corresponding to the first ten subjects)}
+#' 	 }
+#' @references Kuhn E, Lavielle M. Maximum likelihood estimation in nonlinear mixed effects models. Computational Statistics and Data Analysis 49, 4 (2005), 1020-1038.
+#' 
+#' Comets E, Lavenu A, Lavielle M. SAEMIX, an R version of the SAEM algorithm. 20th meeting of the Population Approach Group in Europe, Athens, Greece (2011), Abstr 2173.
+#' @author Emmanuelle Comets \email{emmanuelle.comets@@inserm.fr}
+#' @author Audrey Lavenu
+#' @author Marc Lavielle.
+#' @seealso \code{\link{saemixData}} \code{\link{SaemixModel}} \code{\link{saemixControl}} \code{\link{saemix}}
+#' @examples
+#' methods(class="SaemixData")
+#' 
+#' showClass("SaemixData")
+#' 
+#' @keywords classes
+#' @exportClass SaemixData
+#' @exportClass SaemixSimData
+#' @exportClass SaemixRepData
 
 setClass(
   Class="SaemixData",
@@ -262,6 +278,14 @@ setMethod(
 ####			SaemixData class - accesseur				####
 ####################################################################################
 
+#' Get/set methods for SaemixData object
+#' 
+#' Access slots of a SaemixData using the object["slot"] format
+#' 
+#' @keywords methods
+#' @exportMethod [
+#' @exportMethod [<-
+
 # Getteur
 setMethod(
   f ="[",
@@ -405,7 +429,8 @@ setReplaceMethod(
 ####			SaemixData class - method to read data			####
 ####################################################################################
 
-setMethod("read.saemixData","SaemixData",
+setMethod("read",
+          signature="SaemixData",
   function(object) {
     ow <- options("warn")
     options("warn"=-1)
@@ -594,6 +619,13 @@ setMethod("read.saemixData","SaemixData",
   }
 )
 
+
+#' Create a longitudinal data structure from a file or a dataframe
+#' 
+#' Helper function not intended to be called by the user
+#' @exportMethod read
+
+
 ####################################################################################
 ####			SaemixData class - method to print/show data		####
 ####################################################################################
@@ -731,7 +763,7 @@ setMethod("show","SaemixRepData",
     } else cat("Empty object \n")
     } 
 )
-
+     
 # SaemixSimData
 setMethod("show","SaemixSimData",
   function(object) {
@@ -754,6 +786,24 @@ setMethod("show","SaemixSimData",
 ####################################################################################
 ####				Summary method for SaemixData			####
 ####################################################################################
+
+#' Summarising longitudinal data
+#' 
+#' summary method for class SaemixData
+#' @aliases summary summary,SaemixData summary,SaemixData-method summary-methods
+#' 
+#' @param object an object of clas SaemixData
+#' @param print a boolean controlling whether to print the output or return it silently
+#' @param ... additional arguments (ignored)
+#'     
+#' @return a list with a number of elements extracted from the dataset
+#' \describe{
+#' \item{N}{ number of subjects}
+#' \item{nobs}{ the total number of observations} 
+#' \item{nind.obs}{a vector giving the number of observations for each subject}
+#' \item{id}{subject ID; x: predictors; y: response, and, if present in the data, covariates: the covariates (as many lines as observations) and ind.covariates: the individual covariates (one}
+#' }
+#' @exportMethod summary
 
 setMethod("summary","SaemixData",
   function(object, print=TRUE, ...) {
@@ -926,6 +976,8 @@ setMethod("plot","SaemixData",
   }
 )
 
+#' @exportMethod plot
+
 # Check for mirror plots
 setMethod("plot","SaemixSimData",
   function(x,y,irep=-1,...) {
@@ -964,6 +1016,56 @@ setMethod("plot","SaemixSimData",
 ####		Creating an object of SaemixData class - User-level function	####
 ####################################################################################
 
+#' Function to create a SaemixData object
+#' 
+#' This function creates a SaemixData object. The only mandatory argument is
+#' the name of the dataset. If the dataset has a header (or named columns), the
+#' program will attempt to detect which column correspond to ID, predictor(s)
+#' and response. Warning messages will be printed during the object creation
+#' and should be read for details.
+#' 
+#' This function is the user-friendly constructor for the SaemixData object
+#' class. The read.saemixData is a helper function, used to read the dataset,
+#' and is not intended to be called directly.
+#' 
+#' @name saemixData
+#'     @param name.data name of the dataset (can be a character string giving the name of a file on disk or of a dataset in the R session, or the name of a dataset
+#'     @param header whether the dataset/file contains a header. Defaults to TRUE
+#'     @param sep the field separator character. Defaults to any number of blank spaces ("")
+#'     @param na a character vector of the strings which are to be interpreted as NA values. Defaults to c(NA)
+#'     @param name.group name (or number) of the column containing the subject id
+#'     @param name.predictors name (or number) of the column(s) containing the predictors (the algorithm requires at least one predictor x)
+#'     @param name.response name (or number) of the column containing the response variable y modelled by predictor(s) x
+#'     @param name.covariates name (or number) of the column(s) containing the covariates, if present (otherwise missing)
+#'     @param name.genetic.covariates name (or number) of the column(s) containing the covariates, if present (otherwise missing)
+#'     @param name.mdv name of the column containing the indicator for missing variable
+#'     @param name.cens name of the column containing the indicator for censoring
+#'     @param name.occ name of the column containing the occasion
+#'     @param name.ytype name of the column containing the index of the response
+#'     @param name.X name of the column containing the regression variable to be used on the X axis in the plots (defaults to the first predictor)
+#'     @param units list with up to three elements, x, y and optionally covariates, containing the units for the X and Y variables respectively, as well as the units for the different covariates (defaults to empty)
+#'     @param verbose a boolean indicating whether messages should be printed out during the creation of the object
+#' @details This function is the user-friendly constructor for the SaemixData object class. The read is a helper function, used to read the dataset, and is not intended to be called directly.
+#' @return A SaemixData object (see \code{\link{saemixData}}).
+#' @references Kuhn E, Lavielle M. Maximum likelihood estimation in nonlinear mixed effects models. Computational Statistics and Data Analysis 49, 4 (2005), 1020-1038.
+#' 
+#' Comets E, Lavenu A, Lavielle M. SAEMIX, an R version of the SAEM algorithm. 20th meeting of the Population Approach Group in Europe, Athens, Greece (2011), Abstr 2173.
+#' @author Emmanuelle Comets \email{emmanuelle.comets@@inserm.fr}, Audrey Lavenu, Marc Lavielle.
+#' @seealso \code{\link{SaemixData}},\code{\link{SaemixModel}}, \code{\link{saemixControl}},\code{\link{saemix}}
+#' @examples
+#' 
+#' data(theo.saemix)
+#' 
+#' saemix.data<-saemixData(name.data=theo.saemix,header=TRUE,sep=" ",na=NA, 
+#'   name.group=c("Id"),name.predictors=c("Dose","Time"),
+#'   name.response=c("Concentration"),name.covariates=c("Weight","Sex"),
+#'   units=list(x="hr",y="mg/L",covariates=c("kg","-")), name.X="Time")
+#' 
+#' print(saemix.data)
+#' 
+#' plot(saemix.data)
+#' @export saemixData
+
 saemixData<-function(name.data,header,sep,na,name.group,name.predictors, name.response,name.X, name.covariates=c(), name.genetic.covariates=c(), name.mdv="", name.cens="",name.occ="",name.ytype="", units=list(x="",y="",covariates=c()), verbose=TRUE) {
 # setting proper types for the SaemixData class
   if(missing(name.data) & verbose) {
@@ -985,7 +1087,7 @@ saemixData<-function(name.data,header,sep,na,name.group,name.predictors, name.re
   name.covariates<-c(as.character(name.covariates),as.character(name.genetic.covariates))
   x<-new(Class="SaemixData",name.data=name.data,header=header,sep=sep,na=na, name.group=name.group,name.predictors=name.predictors,name.X=name.X, name.response=name.response,name.covariates=name.covariates,units=units, name.mdv=name.mdv, name.cens=name.cens, name.occ=name.occ, name.ytype=name.ytype, verbose)
 #  showall(x)
-  x1<-read.saemixData(x)
+  x1<-read(x)
   if(class(x1)=="SaemixData") {
   	igen<-rep(FALSE,length(name.covariates))
   	igen[match(name.genetic.covariates,name.covariates)]<-TRUE
@@ -1023,17 +1125,21 @@ transform.SaemixData<-function(`_data`, ...) {
 # 	else `_data`
 # }
 
-# @usage transform.cov(object, covariate, transformation=function(x) x, centering="median" ,verbose=FALSE)
 #' Transform covariates
 #' 
 #' Transform and/or center continuous covariates
 #'
+#' @name transform.cov
+#' @aliases transform.SaemixData
+#' 
 #' @param object saemixData object
 #' @param covariate name of the covariate
 #' @param transformation transformation function. Defaults to no transformation
 #' @param centering string, giving the value used to center the covariate; can be "mean" or "median", in which case this value will be computed from the data, 'none' or 0 for no centering, or a value given by the user. Defaults to the median value over the dataset.
 #' @param verbose a boolean, prints messages during the execution of the function if TRUE. Defaults to FALSE.
-#' @return an object of class \code{"\linkS4class{saemixData}"}
+#' @examples 
+#' # TODO
+#' @return an object of class \code{"\linkS4class{SaemixData}"}
 #' @keywords data
 
 transform.cov<-function(object, covariate, transformation=function(x) x, centering="median" ,verbose=FALSE) {
@@ -1062,16 +1168,20 @@ transform.cov<-function(object, covariate, transformation=function(x) x, centeri
 	return(object)
 }
 
-# @usage transform.cat(object, covariate, group, verbose=FALSE)
 #' Transform covariates
 #' 
 #' Regroup categorical covariates
 #'
+#' @name transform.cat
+#' 
 #' @param object saemixData object
 #' @param covariate name of the covariate
 #' @param group a vector giving the categories to which the initial values of the covariates should be mapped. If the resulting covariate is binary, it will be stored as 0/1. If it has more than 2 categories, dummy covariates will be created for the analysis.
+#' @param reference the reference group
 #' @param verbose a boolean, prints messages during the execution of the function if TRUE. Defaults to FALSE.
-#' @return an object of class \code{"\linkS4class{saemixData}"}
+#' @return an object of class \code{"\linkS4class{SaemixData}"}
+#' @examples 
+#' # TODO
 #' @keywords data
 #' 
 transform.cat<-function(object, covariate, group, reference, verbose=FALSE) {
@@ -1121,6 +1231,21 @@ transform.cat<-function(object, covariate, group, reference, verbose=FALSE) {
 ####################################################################################
 ####				saemixObject class - S3 methods			####
 ####################################################################################
+
+#' Data subsetting
+#' 
+#' Return an SaemixData object containing the subset of data which meets conditions.
+#'
+#' @aliases subset subset.SaemixData
+#' 
+#' @param x saemixData object
+#' @param subset logical expression indicating elements or rows to keep: missing values are taken as false
+#' @param ... additional parameters (ignored)
+#' @return an object of class \code{"\linkS4class{SaemixData}"}
+#' @examples 
+#' # TODO
+#' @keywords data
+#' @export subset.SaemixData
 
 subset.SaemixData<-function (x, subset, ...) {
     if (missing(subset)) 

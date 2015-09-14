@@ -6,30 +6,30 @@ setwd("/home/eco/work/monolix/rversion/current/saemix")
 # Defining generic for new methods
 source("devsaemix/R/global.R")
 
-############################
 # SaemixData
 source("devsaemix/R/SaemixData.R")
-
 # SaemixRes
 source("devsaemix/R/SaemixRes.R")
-
 # SaemixModel
 source("devsaemix/R/SaemixModel.R")
-
 # SaemixObject
 source("devsaemix/R/SaemixObject.R")
 
 # Functions
 source("devsaemix/R/func_main.R")
 source("devsaemix/R/func_aux.R")
-source("devsaemix/R/func_plots.R")
-source("devsaemix/R/compute_LL.R")
 source("devsaemix/R/main_initialiseMainAlgo.R")
 source("devsaemix/R/main_estep.R")
 source("devsaemix/R/main_mstep.R")
+source("devsaemix/R/func_distcond.R")
+source("devsaemix/R/func_FIM.R")
+source("devsaemix/R/compute_LL.R")
+source("devsaemix/R/func_simulations.R")
+source("devsaemix/R/func_plots.R")
 
 # Toggle save feature
 save.results<-TRUE
+save.results<-FALSE
 save.dir<-"Demo"
 if(save.results & !file_test("-d",save.dir)) dir.create(save.dir)
 
@@ -58,6 +58,10 @@ model1cpt<-function(psi,id,xidep) {
 }
 # Default model, no covariate
 saemix.model<-saemixModel(model=model1cpt,description="One-compartment model with first-order absorption",psi0=matrix(c(1.,20,0.5,0.1,0,-0.01),ncol=3,byrow=TRUE, dimnames=list(NULL, c("ka","V","CL"))),transform.par=c(1,1,1))
+
+estonly<-list(seed=39546,save=save.results,save.graphs=save.results,map=F,fim=F,ll.is=F,directory=file.path(save.dir,"theoCov2"))
+theo.onlypop<-saemix(saemix.model,saemix.data,estonly)
+
 saemix.options<-list(seed=632545,save=save.results,save.graphs=save.results,directory=file.path(save.dir,"theoNoCov"))
 
 Rprof("Demo/theoCF1cpt.out")

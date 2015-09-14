@@ -51,3 +51,4 @@
 \contentsline {subsection}{\numberline {4.2.3}Accessing S4 objects in {\sc SAEMIX}}{78}{subsection.4.2.3}
 \contentsline {subsubsection}{Help for S4 objects and methods}{78}{section*.9}
 \contentsline {subsubsection}{Elements for S4 objects defined in {\sc SAEMIX}}{79}{section*.10}
+\contentsline {chapter}{{\bf Bibliography}}{80}{section*.10}
