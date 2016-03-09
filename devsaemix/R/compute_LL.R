@@ -152,7 +152,10 @@ llis.saemix<-function(saemixObject) {
 	saemixObject["results"]["ll.is"]<-LL[KM]
 	saemixObject["results"]["aic.is"]<-(-2)*saemixObject["results"]["ll.is"]+ 2*saemixObject["results"]["npar.est"]
 	saemixObject["results"]["bic.is"]<-(-2)*saemixObject["results"]["ll.is"]+ log(saemixObject["data"]["N"])*saemixObject["results"]["npar.est"]
-	
+	nb.beta.R=sum(saemixObject["model"]["betaest.model"]%*%diag(saemixObject["model"]["fixed.estim"])%*%as.matrix(diag(saemixObject["model"]["covariance.model"])))
+	nb.theta.R=nb.beta.R+sum(saemixObject["model"]["covariance.model"])
+	nb.theta.F=saemixObject["results"]["npar.est"]-nb.theta.R
+	saemixObject["results"]["bic.h.is"]<-(-2)*saemixObject["results"]["ll.is"]+ nb.theta.R*log(saemixObject["data"]["N"])+nb.theta.F*log(saemixObject["data"]["ntot.obs"])
 	return(saemixObject)
 }
 
@@ -359,7 +362,11 @@ llgq.saemix<-function(saemixObject) {
 	saemixObject["results"]["ll.gq"]<-ll
 	saemixObject["results"]["aic.gq"]<-(-2)*saemixObject["results"]["ll.gq"]+ 2*saemixObject["results"]["npar.est"]
 	saemixObject["results"]["bic.gq"]<-(-2)*saemixObject["results"]["ll.gq"]+ log(saemixObject["data"]["N"])*saemixObject["results"]["npar.est"]
-	
+  nb.beta.R=sum(saemixObject["model"]["betaest.model"]%*%diag(saemixObject["model"]["fixed.estim"])%*%as.matrix(diag(saemixObject["model"]["covariance.model"])))
+  nb.theta.R=nb.beta.R+sum(saemixObject["model"]["covariance.model"])
+  nb.theta.F=saemixObject["results"]["npar.est"]-nb.theta.R
+  saemixObject["results"]["bic.h.gq"]<-(-2)*saemixObject["results"]["ll.gq"]+ nb.theta.R*log(saemixObject["data"]["N"])+nb.theta.F*log(saemixObject["data"]["ntot.obs"])
+
 	return(saemixObject)
 }
 

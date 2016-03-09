@@ -79,13 +79,16 @@ setClass(
     ll.lin="numeric",		# for each method (linearisation, IS, GQ)
     aic.lin="numeric",		# ll=log-likelihood
     bic.lin="numeric",		# aic= Akaike Information Criterion
-    ll.is="numeric",		# bic= Bayesian Information Criterion
-    aic.is="numeric",
+    bic.h.lin="numeric",  # bic= Bayesian Information Criterion
+    ll.is="numeric",		  # bic.h= specific Bayesian Information Criterion for mixed
+    aic.is="numeric",     # models (see Delattre, Lavielle and Poursat, EJS, 2014)
     bic.is="numeric",
+    bic.h.is="numeric",
     LL="numeric",		# LL for each iteration in the IS algorithm
     ll.gq="numeric",
     aic.gq="numeric",
     bic.gq="numeric",
+    bic.h.gq="numeric",
 # Model predictions and residuals
 		predictions="data.frame", # data frame containing all the predictions and residuals below
     ypred="numeric",		# vector of mean population predictions
@@ -212,13 +215,16 @@ setMethod(
     "ll.lin"={return(x@ll.lin)},
     "aic.lin"={return(x@aic.lin)},
     "bic.lin"={return(x@bic.lin)},
+    "bic.h.lin"={return(x@bic.h.lin)},
     "ll.is"={return(x@ll.is)},
     "aic.is"={return(x@aic.is)},
     "bic.is"={return(x@bic.is)},
+    "bic.h.is"={return(x@bic.h.is)},
     "LL"={return(x@LL)},
     "ll.gq"={return(x@ll.gq)},
     "aic.gq"={return(x@aic.gq)},
     "bic.gq"={return(x@bic.gq)},
+    "bic.h.gq"={return(x@bic.h.gq)},
     "predictions"={return(x@predictions)},
     "ypred"={return(x@ypred)},
     "ppred"={return(x@ppred)},
@@ -280,13 +286,16 @@ setReplaceMethod(
     "ll.lin"={x@ll.lin<-value},
     "aic.lin"={x@aic.lin<-value},
     "bic.lin"={x@bic.lin<-value},
+    "bic.h.lin"={x@bic.h.lin<-value},
     "ll.is"={x@ll.is<-value},
     "aic.is"={x@aic.is<-value},
     "bic.is"={x@bic.is<-value},
+    "bic.h.is"={x@bic.h.is<-value},
     "LL"={x@LL<-value},
     "ll.gq"={x@ll.gq<-value},
     "aic.gq"={x@aic.gq<-value},
     "bic.gq"={x@bic.gq<-value},
+    "bic.h.gq"={x@bic.h.gq<-value},
     "predictions"={x@predictions<-value},
     "ypred"={x@ypred<-value},
     "ppred"={x@ppred<-value},
@@ -377,22 +386,25 @@ setMethod("print","SaemixRes",
     cat("----------------------------------------------------\n")
     if(length(x@ll.lin)>0) {
     cat("Likelihood computed by linearisation\n")
-    cat("      -2LL=",(-2*x@ll.lin),"\n")
-    cat("      AIC =",x@aic.lin,"\n")
-    cat("      BIC =",x@bic.lin,"\n")
+    cat("      -2LL  =",(-2*x@ll.lin),"\n")
+    cat("      AIC   =",x@aic.lin,"\n")
+    cat("      BIC   =",x@bic.lin,"\n")
+    cat("      BIC.h =",x@bic.h.lin,"\n")
 #  cat("   ECO TODO: verifier si ca renvoie LL ou -2LL\n"): ok renvoie -2LL
     }
     if(length(x@ll.is)>0) {
     cat("\nLikelihood computed by importance sampling\n")
-    cat("      -2LL=",(-2*x@ll.is),"\n")
-    cat("      AIC =",x@aic.is,"\n")
-    cat("      BIC =",x@bic.is,"\n")
+    cat("      -2LL  =",(-2*x@ll.is),"\n")
+    cat("      AIC   =",x@aic.is,"\n")
+    cat("      BIC   =",x@bic.is,"\n")
+    cat("      BIC.h =",x@bic.h.is,"\n")
     }  
     if(length(x@ll.gq)>0) {
     cat("\nLikelihood computed by Gaussian quadrature\n")
-    cat("      -2LL=",(-2*x@ll.gq),"\n")
-    cat("      AIC =",x@aic.gq,"\n")
-    cat("      BIC =",x@bic.gq,"\n")
+    cat("      -2LL  =",(-2*x@ll.gq),"\n")
+    cat("      AIC   =",x@aic.gq,"\n")
+    cat("      BIC   =",x@bic.gq,"\n")
+    cat("      BIC.h =",x@bic.h.gq,"\n")
     }
     cat("----------------------------------------------------\n")
     }
@@ -466,22 +478,25 @@ setMethod("show","SaemixRes",
     }
     if(length(object@ll.lin)>0) {
     cat("Likelihood computed by linearisation\n")
-    cat("      -2LL=",(-2*object@ll.lin),"\n")
-    cat("       AIC=",object@aic.lin,"\n")
-    cat("       BIC=",object@bic.lin,"\n")
+    cat("      -2LL   =",(-2*object@ll.lin),"\n")
+    cat("       AIC   =",object@aic.lin,"\n")
+    cat("       BIC   =",object@bic.lin,"\n")
+    cat("       BIC.h =",object@bic.h.lin,"\n")
 #  cat("   ECO TODO: verifier si ca renvoie LL ou -2LL\n"): ok renvoie -2LL
     }
     if(length(object@ll.is)>0) {
     cat("Likelihood computed by importance sampling\n")
-    cat("      -2LL=",(-2*object@ll.is),"\n")
-    cat("       AIC=",object@aic.is,"\n")
-    cat("       BIC=",object@bic.is,"\n")
+    cat("      -2LL   =",(-2*object@ll.is),"\n")
+    cat("       AIC   =",object@aic.is,"\n")
+    cat("       BIC   =",object@bic.is,"\n")
+    cat("       BIC.h =",object@bic.h.is,"\n")
     }  
     if(length(object@ll.gq)>0) {
     cat("Likelihood computed by Gaussian quadrature\n")
-    cat("      -2LL=",(-2*object@ll.gq),"\n")
-    cat("       AIC=",object@aic.gq,"\n")
-    cat("       BIC=",object@bic.gq,"\n")
+    cat("      -2LL   =",(-2*object@ll.gq),"\n")
+    cat("       AIC   =",object@aic.gq,"\n")
+    cat("       BIC   =",object@bic.gq,"\n")
+    cat("       BIC.h =",object@bic.h.gq,"\n")
     }
 #    cat("----------------------------------------------------\n")
   }
@@ -536,22 +551,25 @@ setMethod("showall","SaemixRes",
     cat("----------------------------------------------------\n")
     if(length(object@ll.lin)>0) {
     cat("Likelihood computed by linearisation\n")
-    cat("      -2LL=",(-2*object@ll.lin),"\n")
-    cat("      AIC =",object@aic.lin,"\n")
-    cat("      BIC =",object@bic.lin,"\n")
+    cat("      -2LL  =",(-2*object@ll.lin),"\n")
+    cat("      AIC   =",object@aic.lin,"\n")
+    cat("      BIC   =",object@bic.lin,"\n")
+    cat("      BIC.h =",object@bic.h.lin,"\n")
 #  cat("   ECO TODO: verifier si ca renvoie LL ou -2LL\n"): ok renvoie -2LL
     }
     if(length(object@ll.is)>0) {
     cat("\nLikelihood computed by importance sampling\n")
-    cat("      -2LL=",(-2*object@ll.is),"\n")
-    cat("      AIC =",object@aic.is,"\n")
-    cat("      BIC =",object@bic.is,"\n")
+    cat("      -2LL  =",(-2*object@ll.is),"\n")
+    cat("      AIC   =",object@aic.is,"\n")
+    cat("      BIC   =",object@bic.is,"\n")
+    cat("      BIC.h =",object@bic.h.is,"\n")
     }  
     if(length(object@ll.gq)>0) {
     cat("\nLikelihood computed by Gaussian quadrature\n")
-    cat("      -2LL=",(-2*object@ll.gq),"\n")
-    cat("      AIC =",object@aic.gq,"\n")
-    cat("      BIC =",object@bic.gq,"\n")
+    cat("      -2LL  =",(-2*object@ll.gq),"\n")
+    cat("      AIC   =",object@aic.gq,"\n")
+    cat("      BIC   =",object@bic.gq,"\n")
+    cat("      BIC.h =",object@bic.h.gq,"\n")
     }
     cat("----------------------------------------------------\n")
   }

@@ -256,6 +256,10 @@ fim.saemix<-function(saemixObject) {
   saemix.res["fim"]<-fim
   saemix.res["aic.lin"]<-(-2)*saemix.res["ll.lin"]+ 2*saemix.res["npar.est"]
   saemix.res["bic.lin"]<-(-2)*saemix.res["ll.lin"]+ log(saemix.data["N"])*saemix.res["npar.est"]
+  nb.beta.R=sum(saemixObject["model"]["betaest.model"]%*%diag(saemixObject["model"]["fixed.estim"])%*%as.matrix(diag(saemixObject["model"]["covariance.model"])))
+  nb.theta.R=nb.beta.R+sum(saemixObject["model"]["covariance.model"])
+  nb.theta.F=saemixObject["results"]["npar.est"]-nb.theta.R
+  saemix.res["bic.h.lin"]<-(-2)*saemix.res["ll.lin"]+ nb.theta.R*log(saemixObject["data"]["N"])+nb.theta.F*log(saemixObject["data"]["ntot.obs"])
   
   ##################################
   #delete(hw)

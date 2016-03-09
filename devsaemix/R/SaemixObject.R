@@ -342,7 +342,7 @@ setMethod("summary","SaemixObject",
     try(colnames(tab)<-rownames(tab)<-object@results@name.random)
     if(print) print(tab,quote=FALSE)
     l1<-rep(NA,3)
-    tab.ll<-data.frame(Method=c("Linearisation","Importance Sampling","Gaussian Quadrature"),"-2xLL"=l1,AIC=l1,BIC=l1)
+    tab.ll<-data.frame(Method=c("Linearisation","Importance Sampling","Gaussian Quadrature"),"-2xLL"=l1,AIC=l1,BIC=l1,BIC.h=l1)
     if(length(object@results@ll.lin)>0 | length(object@results@ll.is)>0 | length(object@results@ll.gq)>0) {
     	if(print) {
     cat("----------------------------------------------------\n")
@@ -352,29 +352,32 @@ setMethod("summary","SaemixObject",
     if(length(object@results@ll.lin)>0) {
     	if(print) {
     cat("Likelihood computed by linearisation\n")
-    cat("      -2LL=",(-2*object@results@ll.lin),"\n")
-    cat("      AIC =",object@results@aic.lin,"\n")
-    cat("      BIC =",object@results@bic.lin,"\n")
+    cat("      -2LL  =",(-2*object@results@ll.lin),"\n")
+    cat("      AIC   =",object@results@aic.lin,"\n")
+    cat("      BIC   =",object@results@bic.lin,"\n")
+    cat("      BIC.h =",object@results@bic.h.lin,"\n")
     	}
-    tab.ll[1,2:4]<-c((-2*object@results@ll.lin),object@results@aic.lin, object@results@bic.lin)
+    tab.ll[1,2:5]<-c((-2*object@results@ll.lin),object@results@aic.lin, object@results@bic.lin, object@results@bic.h.lin)
     }
     if(length(object@results@ll.is)>0) {
     	if(print) {
     cat("\nLikelihood computed by importance sampling\n")
-    cat("      -2LL=",(-2*object@results@ll.is),"\n")
-    cat("      AIC =",object@results@aic.is,"\n")
-    cat("      BIC =",object@results@bic.is,"\n")
+    cat("      -2LL  =",(-2*object@results@ll.is),"\n")
+    cat("      AIC   =",object@results@aic.is,"\n")
+    cat("      BIC   =",object@results@bic.is,"\n")
+    cat("      BIC.h =",object@results@bic.h.is,"\n")
     	}
-    tab.ll[2,2:4]<-c((-2*object@results@ll.is),object@results@aic.is, object@results@bic.is)
+    tab.ll[2,2:5]<-c((-2*object@results@ll.is),object@results@aic.is, object@results@bic.is, object@results@bic.h.is)
     }  
     if(length(object@results@ll.gq)>0) {
     	if(print) {
     cat("\nLikelihood computed by Gaussian quadrature\n")
-    cat("      -2LL=",(-2*object@results@ll.gq),"\n")
-    cat("      AIC =",object@results@aic.gq,"\n")
-    cat("      BIC =",object@results@bic.gq,"\n")
+    cat("      -2LL  =",(-2*object@results@ll.gq),"\n")
+    cat("      AIC   =",object@results@aic.gq,"\n")
+    cat("      BIC   =",object@results@bic.gq,"\n")
+    cat("      BIC.h =",object@results@bic.h.gq,"\n")
     	}
-    tab.ll[3,2:4]<-c((-2*object@results@ll.gq),object@results@aic.gq, object@results@bic.gq)
+    tab.ll[3,2:5]<-c((-2*object@results@ll.gq),object@results@aic.gq, object@results@bic.gq, object@results@bic.h.gq)
     }
     if(print) cat("----------------------------------------------------\n")
     }
